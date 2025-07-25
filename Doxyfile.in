@@ -1,0 +1,144 @@
+# Doxyfile for Euler Mathematical Library
+# This file is configured by CMake
+
+# Project information
+PROJECT_NAME           = "Euler Mathematical Library"
+PROJECT_NUMBER         = "1.1"
+PROJECT_BRIEF          = "A modern C++ mathematical library with expression templates"
+PROJECT_LOGO           = 
+
+# Input/output directories
+INPUT                  = @CMAKE_SOURCE_DIR@/include/euler
+INPUT_ENCODING         = UTF-8
+FILE_PATTERNS          = *.hh *.md
+RECURSIVE              = YES
+EXCLUDE                = 
+EXCLUDE_PATTERNS       = */test/* */build/* */cmake-build-*/*
+USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/README.md
+
+# Output configuration
+OUTPUT_DIRECTORY       = @DOXYGEN_OUTPUT_DIR@
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_XML           = NO
+
+# Build options
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_ANON_NSPACES   = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+HIDE_FRIEND_COMPOUNDS  = NO
+HIDE_IN_BODY_DOCS      = NO
+INTERNAL_DOCS          = NO
+CASE_SENSE_NAMES       = YES
+HIDE_SCOPE_NAMES       = NO
+SHOW_INCLUDE_FILES     = YES
+INLINE_INFO            = YES
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = YES
+SORT_GROUP_NAMES       = YES
+SORT_BY_SCOPE_NAME     = NO
+
+# Preprocessing
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+SEARCH_INCLUDES        = YES
+INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include
+PREDEFINED             = EULER_DEFAULT_MATRIX_LAYOUT_COLUMN_MAJOR \
+                        "EULER_CHECK(cond, code, ...)=" \
+                        "EULER_CHECK_INDEX(idx, size)=" \
+                        "EULER_CHECK_SIZE(size1, size2)=" \
+                        "EULER_ENFORCE(cond, code, ...)=" \
+                        "EULER_HOT=[[gnu::hot]]" \
+                        "EULER_COLD=[[gnu::cold]]" \
+                        "EULER_FLATTEN=[[gnu::flatten]]" \
+                        "EULER_ALWAYS_INLINE=inline" \
+                        "EULER_NEVER_INLINE=" \
+                        "EULER_RESTRICT=__restrict" \
+                        "EULER_LOOP_VECTORIZE=" \
+                        "EULER_LOOP_UNROLL(n)=" \
+                        "EULER_HAS_XSIMD"
+
+# Diagrams
+HAVE_DOT               = NO
+CLASS_DIAGRAMS         = YES
+HIDE_UNDOC_RELATIONS   = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+TEMPLATE_RELATIONS     = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+
+# HTML output
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+HTML_TIMESTAMP         = YES
+HTML_DYNAMIC_SECTIONS  = YES
+GENERATE_TREEVIEW      = YES
+TREEVIEW_WIDTH         = 250
+
+# Source browsing
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+REFERENCES_LINK_SOURCE = YES
+USE_HTAGS              = NO
+VERBATIM_HEADERS       = YES
+
+# Index
+ALPHABETICAL_INDEX     = YES
+COLS_IN_ALPHA_INDEX    = 5
+
+# LaTeX output (disabled)
+GENERATE_LATEX         = NO
+
+# XML output (disabled)
+GENERATE_XML           = NO
+
+# External references
+TAGFILES               = 
+GENERATE_TAGFILE       = 
+ALLEXTERNALS           = NO
+EXTERNAL_GROUPS        = YES
+
+# Dot tool (disabled)
+CLASS_DIAGRAMS         = YES
+HIDE_UNDOC_RELATIONS   = YES
+HAVE_DOT               = NO
+
+# Configuration options
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_FORMAT            = "$file:$line: $text"
+WARN_LOGFILE           = 
+
+# Examples
+EXAMPLE_PATH           = @CMAKE_SOURCE_DIR@/examples
+EXAMPLE_PATTERNS       = *.cc
+EXAMPLE_RECURSIVE      = YES
+
+# Groups and modules
+DISTRIBUTE_GROUP_DOC   = YES
+GROUP_NESTED_COMPOUNDS = YES
+SUBGROUPING            = YES
+
+# Markdown support
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
