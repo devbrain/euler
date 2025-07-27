@@ -12,6 +12,7 @@
 #include <euler/angles/angle.hh>
 #include <euler/angles/angle_ops.hh>
 #include <euler/math/trigonometry.hh>
+#include <euler/core/compiler.hh>
 #include <array>
 
 namespace euler::dda {
@@ -62,11 +63,25 @@ private:
             }
         };
         
-        // 4-way symmetry
-        add_if_valid(center_.x + x_, center_.y + y_);
-        add_if_valid(center_.x - x_, center_.y + y_);
-        add_if_valid(center_.x + x_, center_.y - y_);
-        add_if_valid(center_.x - x_, center_.y - y_);
+        // Handle special cases to avoid duplicates
+        if (x_ == 0 && y_ == 0) {
+            // Center point only (degenerate ellipse)
+            add_if_valid(center_.x, center_.y);
+        } else if (x_ == 0) {
+            // On vertical axis - only 2 points
+            add_if_valid(center_.x, center_.y + y_);
+            add_if_valid(center_.x, center_.y - y_);
+        } else if (y_ == 0) {
+            // On horizontal axis - only 2 points
+            add_if_valid(center_.x + x_, center_.y);
+            add_if_valid(center_.x - x_, center_.y);
+        } else {
+            // General case - 4-way symmetry
+            add_if_valid(center_.x + x_, center_.y + y_);
+            add_if_valid(center_.x - x_, center_.y + y_);
+            add_if_valid(center_.x + x_, center_.y - y_);
+            add_if_valid(center_.x - x_, center_.y - y_);
+        }
     }
     
     bool is_angle_in_arc(int dx, int dy) const {
@@ -180,6 +195,8 @@ public:
     /**
      * @brief Advance to next pixel
      */
+    EULER_DISABLE_WARNING_PUSH
+    EULER_DISABLE_WARNING_STRICT_OVERFLOW
     ellipse_iterator& operator++() {
         quadrant_index_++;
         
@@ -190,18 +207,18 @@ public:
                 x_++;
                 
                 if (d1_ < 0) {
-                    d1_ += fb2_ * x_ + b2_;
+                    d1_ += static_cast<int64_t>(fb2_) * x_ + b2_;
                 } else {
                     y_--;
-                    d1_ += fb2_ * x_ - fa2_ * y_ + b2_;
+                    d1_ += static_cast<int64_t>(fb2_) * x_ - static_cast<int64_t>(fa2_) * y_ + b2_;
                 }
                 
                 // Check transition to region 2
-                if (b2_ * x_ >= a2_ * y_) {
+                if (static_cast<int64_t>(b2_) * x_ >= static_cast<int64_t>(a2_) * y_) {
                     in_region2_ = true;
                     // Initial decision parameter for region 2
-                    d2_ = b2_ * (x_ + 1/2) * (x_ + 1/2) + 
-                          a2_ * (y_ - 1) * (y_ - 1) - a2_ * b2_;
+                    d2_ = static_cast<int64_t>(b2_) * (x_ + 1/2) * (x_ + 1/2) + 
+                          static_cast<int64_t>(a2_) * (y_ - 1) * (y_ - 1) - static_cast<int64_t>(a2_) * b2_;
                 }
             } else {
                 // Region 2: gradient < -1
@@ -213,10 +230,10 @@ public:
                 }
                 
                 if (d2_ > 0) {
-                    d2_ += a2_ - fa2_ * y_;
+                    d2_ += a2_ - static_cast<int64_t>(fa2_) * y_;
                 } else {
                     x_++;
-                    d2_ += fb2_ * x_ - fa2_ * y_ + a2_;
+                    d2_ += static_cast<int64_t>(fb2_) * x_ - static_cast<int64_t>(fa2_) * y_ + a2_;
                 }
             }
             
@@ -229,6 +246,7 @@ public:
         
         return *this;
     }
+    EULER_DISABLE_WARNING_POP
     
     /**
      * @brief Post-increment

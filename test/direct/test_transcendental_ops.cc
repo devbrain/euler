@@ -9,9 +9,14 @@
 #include <euler/vector/vector.hh>
 #include <euler/core/approx_equal.hh>
 #include <euler/core/types.hh>
+#include <euler/core/compiler.hh>
 #include <random>
 #include <chrono>
 #include <vector>
+
+// Disable strict overflow warnings for xsimd's internal functions
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 
 using namespace euler;
 using namespace euler::direct;
@@ -443,3 +448,5 @@ TEST_CASE("Performance verification") {
         CHECK(direct_time.count() < std_time.count() * 3);
     }
 }
+
+EULER_DISABLE_WARNING_POP

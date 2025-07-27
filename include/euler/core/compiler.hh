@@ -124,3 +124,22 @@
     #define EULER_PREFETCH_WRITE(addr) ((void)0)
     #define EULER_PREFETCH_READ_NTA(addr) ((void)0)
 #endif
+
+// Warning suppression macros
+#if defined(EULER_COMPILER_GCC)
+    #define EULER_DISABLE_WARNING_PUSH _Pragma("GCC diagnostic push")
+    #define EULER_DISABLE_WARNING_POP _Pragma("GCC diagnostic pop")
+    #define EULER_DISABLE_WARNING_STRICT_OVERFLOW _Pragma("GCC diagnostic ignored \"-Wstrict-overflow\"")
+#elif defined(EULER_COMPILER_CLANG)
+    #define EULER_DISABLE_WARNING_PUSH _Pragma("clang diagnostic push")
+    #define EULER_DISABLE_WARNING_POP _Pragma("clang diagnostic pop")
+    #define EULER_DISABLE_WARNING_STRICT_OVERFLOW _Pragma("clang diagnostic ignored \"-Wstrict-overflow\"")
+#elif defined(EULER_COMPILER_MSVC)
+    #define EULER_DISABLE_WARNING_PUSH __pragma(warning(push))
+    #define EULER_DISABLE_WARNING_POP __pragma(warning(pop))
+    #define EULER_DISABLE_WARNING_STRICT_OVERFLOW
+#else
+    #define EULER_DISABLE_WARNING_PUSH
+    #define EULER_DISABLE_WARNING_POP
+    #define EULER_DISABLE_WARNING_STRICT_OVERFLOW
+#endif

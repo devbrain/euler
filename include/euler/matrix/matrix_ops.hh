@@ -125,7 +125,7 @@ auto transpose(const Expr& expr) {
 
 // Trace (sum of diagonal elements) for concrete matrices
 template<typename T, size_t N, bool RowMajor>
-T trace(const matrix<T, N, N, RowMajor>& m) {
+constexpr T trace(const matrix<T, N, N, RowMajor>& m) {
     T sum = T(0);
     for (size_t i = 0; i < N; ++i) {
         sum += m(i, i);
@@ -173,8 +173,10 @@ auto hadamard_div_direct(const matrix<T, M, N, RowMajor1>& a, const matrix<T, M,
     matrix<T, M, N, RowMajor1> result;
     
     for (size_t i = 0; i < M * N; ++i) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(b[i] != T(0), error_code::invalid_argument, 
                     "Division by zero in Hadamard division");
+        #endif
         result[i] = a[i] / b[i];
     }
     
@@ -197,19 +199,19 @@ T frobenius_norm(const matrix<T, M, N, RowMajor>& m) {
 
 // 2x2 determinant
 template<typename T, bool RowMajor>
-T determinant(const matrix<T, 2, 2, RowMajor>& m) {
+constexpr T determinant(const matrix<T, 2, 2, RowMajor>& m) {
     return fast_determinant_2x2(m);
 }
 
 // 3x3 determinant
 template<typename T, bool RowMajor>
-T determinant(const matrix<T, 3, 3, RowMajor>& m) {
+constexpr T determinant(const matrix<T, 3, 3, RowMajor>& m) {
     return fast_determinant_3x3(m);
 }
 
 // 4x4 determinant
 template<typename T, bool RowMajor>
-T determinant(const matrix<T, 4, 4, RowMajor>& m) {
+constexpr T determinant(const matrix<T, 4, 4, RowMajor>& m) {
     return fast_determinant_4x4(m);
 }
 
@@ -252,9 +254,11 @@ auto inverse(const Expr& expr) {
 template<typename T, bool RowMajor>
 auto inverse_direct(const matrix<T, 2, 2, RowMajor>& m) 
     -> matrix<T, 2, 2, RowMajor> {
+    #ifdef EULER_DEBUG
     T det = fast_determinant_2x2(m);
     EULER_CHECK(std::abs(det) > constants<T>::epsilon, error_code::singular_matrix,
                 "Matrix is singular (determinant = ", det, ")");
+    #endif
     
     return fast_inverse_2x2(m);
 }
@@ -263,9 +267,11 @@ auto inverse_direct(const matrix<T, 2, 2, RowMajor>& m)
 template<typename T, bool RowMajor>
 auto inverse_direct(const matrix<T, 3, 3, RowMajor>& m) 
     -> matrix<T, 3, 3, RowMajor> {
+    #ifdef EULER_DEBUG
     T det = fast_determinant_3x3(m);
     EULER_CHECK(std::abs(det) > constants<T>::epsilon, error_code::singular_matrix,
                 "Matrix is singular (determinant = ", det, ")");
+    #endif
     
     return fast_inverse_3x3(m);
 }

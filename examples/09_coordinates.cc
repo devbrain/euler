@@ -110,7 +110,8 @@ int main() {
     
     // Transform through pipeline
     auto view_point = view * world_point;
-    std::cout << "  world " << world_point << " -> view " << view_point << "\n";
+    auto clip_point = proj * view_point;
+    std::cout << "  world " << world_point << " -> view " << view_point << " -> clip " << clip_point << "\n";
     
     // Lerp between points
     std::cout << "\nInterpolation:\n";

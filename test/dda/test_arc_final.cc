@@ -46,7 +46,7 @@ int main() {
             auto span = *filled;
             count++;
             // Check if span is on the right side (x >= center.x)
-            if (span.x_start >= center.x) {
+            if (span.x_start >= static_cast<int>(center.x)) {
                 right_side_count++;
             }
         }

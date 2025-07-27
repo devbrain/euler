@@ -78,9 +78,9 @@ int main() {
     // Initialize with random values
     for (size_t i = 0; i < size; ++i) {
         vectors[i] = vector<float, 3>(
-            static_cast<float>(i % 100) / 100.0f,
-            static_cast<float>((i + 1) % 100) / 100.0f,
-            static_cast<float>((i + 2) % 100) / 100.0f
+            static_cast<float>(static_cast<int>(i) % 100) / 100.0f,
+            static_cast<float>(static_cast<int>((i + 1)) % 100) / 100.0f,
+            static_cast<float>(static_cast<int>((i + 2)) % 100) / 100.0f
         );
     }
     

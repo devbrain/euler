@@ -14,8 +14,8 @@ int main() {
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
     
     matrix4<float> a, b;
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
+    for (size_t i = 0; i < 4; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
             a(i,j) = dist(gen);
             b(i,j) = dist(gen);
         }

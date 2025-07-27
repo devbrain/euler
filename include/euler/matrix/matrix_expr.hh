@@ -788,14 +788,18 @@ private:
             
             // Compute inverse based on size
             if constexpr (rows == 2) {
+                #ifdef EULER_DEBUG
                 value_type det = fast_determinant_2x2(m);
                 EULER_CHECK(std::abs(det) > constants<value_type>::epsilon, error_code::singular_matrix,
                             "Matrix is singular (determinant = ", det, ")");
+                #endif
                 cached_inverse_ = fast_inverse_2x2(m);
             } else if constexpr (rows == 3) {
+                #ifdef EULER_DEBUG
                 value_type det = fast_determinant_3x3(m);
                 EULER_CHECK(std::abs(det) > constants<value_type>::epsilon, error_code::singular_matrix,
                             "Matrix is singular (determinant = ", det, ")");
+                #endif
                 cached_inverse_ = fast_inverse_3x3(m);
             } else if constexpr (rows == 4) {
                 cached_inverse_ = fast_inverse_4x4(m);

@@ -831,8 +831,10 @@ void vecmat(const vector<T, M>& vec,
 template<typename T, bool ColumnMajor>
 void inverse(const matrix<T, 2, 2, ColumnMajor>& m, matrix<T, 2, 2, ColumnMajor>& result) {
     const T det = determinant(m);
+    #ifdef EULER_DEBUG
     EULER_CHECK(std::abs(det) > std::numeric_limits<T>::epsilon() * T(10),
                 error_code::singular_matrix, "Matrix is singular");
+    #endif
     
     const T inv_det = T(1) / det;
     
@@ -865,8 +867,10 @@ void inverse(const matrix<T, 2, 2, ColumnMajor>& m, matrix<T, 2, 2, ColumnMajor>
 template<typename T, bool ColumnMajor>
 void inverse(const matrix<T, 3, 3, ColumnMajor>& m, matrix<T, 3, 3, ColumnMajor>& result) {
     const T det = determinant(m);
+    #ifdef EULER_DEBUG
     EULER_CHECK(std::abs(det) > std::numeric_limits<T>::epsilon() * T(100),
                 error_code::singular_matrix, "Matrix is singular");
+    #endif
     
     const T inv_det = T(1) / det;
     
@@ -937,8 +941,10 @@ void inverse(const matrix<T, 4, 4, ColumnMajor>& m, matrix<T, 4, 4, ColumnMajor>
     // Compute determinant using first row
     const T det = m(0,0)*c00 + m(0,1)*c01 + m(0,2)*c02 + m(0,3)*c03;
     
+    #ifdef EULER_DEBUG
     EULER_CHECK(std::abs(det) > std::numeric_limits<T>::epsilon() * T(1000),
                 error_code::singular_matrix, "Matrix is singular");
+    #endif
     
     const T inv_det = T(1) / det;
     

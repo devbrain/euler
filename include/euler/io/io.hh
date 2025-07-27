@@ -160,14 +160,14 @@ void pretty_print_vector_func(std::ostream& os, const Func& get_elem, size_t siz
 
 // Vector output operator with pretty printing
 template<typename T, size_t N>
-std::ostream& operator<<(std::ostream& os, const vector<T, N>& v) {
+inline std::ostream& operator<<(std::ostream& os, const vector<T, N>& v) {
     detail::pretty_print_vector(os, v, N);
     return os;
 }
 
 // Generic expression output - evaluates and prints based on expression traits
 template<typename Expr, typename T>
-auto operator<<(std::ostream& os, const expression<Expr, T>& expr) 
+inline auto operator<<(std::ostream& os, const expression<Expr, T>& expr) 
     -> std::enable_if_t<std::is_base_of_v<expression<Expr, T>, Expr>, std::ostream&>
 {
     const auto& derived = static_cast<const Expr&>(expr);
@@ -196,14 +196,14 @@ auto operator<<(std::ostream& os, const expression<Expr, T>& expr)
 
 // Matrix output operator with pretty printing
 template<typename T, size_t R, size_t C, bool ColumnMajor>
-std::ostream& operator<<(std::ostream& os, const matrix<T, R, C, ColumnMajor>& m) {
+inline std::ostream& operator<<(std::ostream& os, const matrix<T, R, C, ColumnMajor>& m) {
     detail::pretty_print_matrix(os, m, R, C);
     return os;
 }
 
 // Matrix view output operator with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const matrix_view<T>& mv) {
+inline std::ostream& operator<<(std::ostream& os, const matrix_view<T>& mv) {
     const size_t rows = mv.rows();
     const size_t cols = mv.cols();
     
@@ -225,7 +225,7 @@ std::ostream& operator<<(std::ostream& os, const matrix_view<T>& mv) {
 
 // Const matrix view output operator with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const const_matrix_view<T>& mv) {
+inline std::ostream& operator<<(std::ostream& os, const const_matrix_view<T>& mv) {
     const size_t rows = mv.rows();
     const size_t cols = mv.cols();
     
@@ -247,7 +247,7 @@ std::ostream& operator<<(std::ostream& os, const const_matrix_view<T>& mv) {
 
 // Quaternion output operator with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const quaternion<T>& q) {
+inline std::ostream& operator<<(std::ostream& os, const quaternion<T>& q) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -283,7 +283,7 @@ std::ostream& operator<<(std::ostream& os, const quaternion<T>& q) {
 
 // Angle output operators with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const radian<T>& r) {
+inline std::ostream& operator<<(std::ostream& os, const radian<T>& r) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -304,7 +304,7 @@ std::ostream& operator<<(std::ostream& os, const radian<T>& r) {
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const degree<T>& d) {
+inline std::ostream& operator<<(std::ostream& os, const degree<T>& d) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();

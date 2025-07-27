@@ -101,7 +101,7 @@ inline size_t simd_alignment() {
 
 // Helper to check if a pointer is aligned
 template<typename T>
-bool is_aligned(const T* ptr) {
+inline bool is_aligned(const T* ptr) {
     return reinterpret_cast<uintptr_t>(ptr) % simd_alignment<T>() == 0;
 }
 

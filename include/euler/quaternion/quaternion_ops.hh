@@ -20,9 +20,13 @@ inline quaternion<T> conjugate(const quaternion<T>& q) {
 // Inverse: q^(-1) = q* / |q|²
 template<typename T>
 inline quaternion<T> inverse(const quaternion<T>& q) {
+    #ifdef EULER_DEBUG
     T norm_sq = q.norm_squared();
     EULER_CHECK(norm_sq > constants<T>::epsilon, error_code::invalid_argument,
                 "quaternion::inverse: cannot invert zero quaternion");
+    #else
+    T norm_sq = q.norm_squared();
+    #endif
     
     T inv_norm = T(1) / norm_sq;
     return quaternion<T>(
@@ -115,9 +119,13 @@ inline quaternion<T> exp(const quaternion<T>& q) {
 // For general quaternion: log(q) = (log|q|, v̂ θ)
 template<typename T>
 inline quaternion<T> log(const quaternion<T>& q) {
+    #ifdef EULER_DEBUG
     T qlen = q.length();
     EULER_CHECK(qlen > constants<T>::epsilon, error_code::invalid_argument,
                 "quaternion::log: cannot take log of zero quaternion");
+    #else
+    T qlen = q.length();
+    #endif
     
     T vlen = sqrt(q.x()*q.x() + q.y()*q.y() + q.z()*q.z());
     

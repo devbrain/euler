@@ -33,7 +33,7 @@ namespace euler {
 
 // Stream output for 2D points with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const point2<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const point2<T>& p) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -58,7 +58,7 @@ std::ostream& operator<<(std::ostream& os, const point2<T>& p) {
 
 // Stream output for 3D points with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const point3<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const point3<T>& p) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -86,7 +86,7 @@ std::ostream& operator<<(std::ostream& os, const point3<T>& p) {
 
 // Stream output for 2D projective coordinates with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const projective2<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const projective2<T>& p) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -114,7 +114,7 @@ std::ostream& operator<<(std::ostream& os, const projective2<T>& p) {
 
 // Stream output for 3D projective coordinates with pretty printing
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const projective3<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const projective3<T>& p) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();

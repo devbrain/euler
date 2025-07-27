@@ -112,8 +112,8 @@ int main() {
     std::cout << "Interpolating from identity to 180° Z rotation:\n";
     for (float t = 0; t <= 1.0f; t += 0.25f) {
         auto q_interp = slerp(q_start, q_end, t);
-        auto angle = degree<float>(q_interp.angle());
-        std::cout << "  t=" << t << ": angle=" << angle << "\n";
+        auto angle_ = degree<float>(q_interp.angle());
+        std::cout << "  t=" << t << ": angle=" << angle_ << "\n";
     }
     std::cout << "\n";
     

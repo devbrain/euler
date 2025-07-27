@@ -598,14 +598,18 @@ inline auto fract(const expression<Derived, T>& expr) {
 // Scalar version
 template<typename T>
 inline auto mod(T x, T y) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
+    #ifdef EULER_DEBUG
     EULER_CHECK(y != T(0), error_code::invalid_argument, "mod: division by zero");
+    #endif
     return x - y * std::floor(x / y);
 }
 
 // Vector version (pointwise)
 template<typename T, size_t N>
 inline vector<T, N> mod(const vector<T, N>& v, T divisor) {
+    #ifdef EULER_DEBUG
     EULER_CHECK(divisor != T(0), error_code::invalid_argument, "mod: division by zero");
+    #endif
     vector<T, N> result;
     for (size_t i = 0; i < N; ++i) {
         result[i] = v[i] - divisor * std::floor(v[i] / divisor);
@@ -618,7 +622,9 @@ template<typename T, size_t N>
 inline vector<T, N> mod(const vector<T, N>& v1, const vector<T, N>& v2) {
     vector<T, N> result;
     for (size_t i = 0; i < N; ++i) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(v2[i] != T(0), error_code::invalid_argument, "mod: division by zero at index ", i);
+        #endif
         result[i] = v1[i] - v2[i] * std::floor(v1[i] / v2[i]);
     }
     return result;
@@ -652,14 +658,18 @@ inline auto mod(const expression<Derived, T>& expr, U divisor) {
 // Scalar version
 template<typename T>
 inline auto fmod(T x, T y) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
+    #ifdef EULER_DEBUG
     EULER_CHECK(y != T(0), error_code::invalid_argument, "fmod: division by zero");
+    #endif
     return std::fmod(x, y);
 }
 
 // Vector version (pointwise)
 template<typename T, size_t N>
 inline vector<T, N> fmod(const vector<T, N>& v, T divisor) {
+    #ifdef EULER_DEBUG
     EULER_CHECK(divisor != T(0), error_code::invalid_argument, "fmod: division by zero");
+    #endif
     vector<T, N> result;
     for (size_t i = 0; i < N; ++i) {
         result[i] = std::fmod(v[i], divisor);
@@ -839,7 +849,9 @@ inline auto saturate(const expression<Derived, T>& expr) {
 // Reciprocal function
 template<typename T>
 inline auto rcp(T x) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
+    #ifdef EULER_DEBUG
     EULER_CHECK(x != T(0), error_code::invalid_argument, "rcp: division by zero");
+    #endif
     return T(1) / x;
 }
 
@@ -848,7 +860,9 @@ template<typename T, size_t N>
 inline vector<T, N> rcp(const vector<T, N>& v) {
     vector<T, N> result;
     for (size_t i = 0; i < N; ++i) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(v[i] != T(0), error_code::invalid_argument, "rcp: division by zero at index ", i);
+        #endif
         result[i] = T(1) / v[i];
     }
     return result;
@@ -860,7 +874,9 @@ inline matrix<T, M, N> rcp(const matrix<T, M, N>& m) {
     matrix<T, M, N> result;
     for (size_t i = 0; i < M; ++i) {
         for (size_t j = 0; j < N; ++j) {
+            #ifdef EULER_DEBUG
             EULER_CHECK(m(i, j) != T(0), error_code::invalid_argument, "rcp: division by zero at (", i, ",", j, ")");
+            #endif
             result(i, j) = T(1) / m(i, j);
         }
     }

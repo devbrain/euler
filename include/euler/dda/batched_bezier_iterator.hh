@@ -207,7 +207,7 @@ namespace euler::dda {
                     // Check if we need to fill gaps with a line
                     if (!current_batch_.is_empty()) {
                         auto last = current_batch_.pixels[current_batch_.count - 1].pos;
-                        if (distance_squared(pixel, last) > 1) {
+                        if (distance_squared(pixel, last) > 2) {
                             // Fill gap with line pixels
                             fill_line_gap(last, pixel);
                         }
@@ -315,7 +315,8 @@ namespace euler::dda {
             template<typename Callback>
             void process_all(Callback&& callback) {
                 while (!at_end()) {
-                    batch_processor <T>::process_pixel_batch(current_batch_, callback);
+                    // Call the callback directly with the current batch
+                    callback(current_batch_);
                     next_batch();
                 }
             }
@@ -487,7 +488,7 @@ namespace euler::dda {
                         // Fill gaps if needed
                         if (!current_batch_.is_empty()) {
                             auto last = current_batch_.pixels[current_batch_.count - 1].pos;
-                            if (distance_squared(pixel, last) > 1) {
+                            if (distance_squared(pixel, last) > 2) {
                                 fill_line_gap(last, pixel);
                             }
                         }

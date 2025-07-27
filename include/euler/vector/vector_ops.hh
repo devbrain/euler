@@ -77,7 +77,7 @@ auto cross(const vector<T, 3>& a, const Expr& b) -> std::enable_if_t<
 
 // Overload for when we explicitly want immediate evaluation
 template<typename T>
-vector<T, 3> cross_eval(const vector<T, 3>& a, const vector<T, 3>& b) {
+constexpr vector<T, 3> cross_eval(const vector<T, 3>& a, const vector<T, 3>& b) {
     return vector<T, 3>(
         a.y() * b.z() - a.z() * b.y(),
         a.z() * b.x() - a.x() * b.z(),
@@ -253,7 +253,7 @@ auto lerp(const Vec& a, const Expr& b, T t) -> std::enable_if_t<
 template<typename Vec1, typename Vec2,
          typename = std::enable_if_t<is_any_vector_v<Vec1> && is_any_vector_v<Vec2> &&
                                     vector_size_helper<Vec1>::value == vector_size_helper<Vec2>::value>>
-auto dot(const Vec1& a, const Vec2& b) -> typename Vec1::value_type {
+constexpr auto dot(const Vec1& a, const Vec2& b) -> typename Vec1::value_type {
     using T = typename Vec1::value_type;
     constexpr size_t N = vector_size_helper<Vec1>::value;
     T result = T(0);

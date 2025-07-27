@@ -101,9 +101,9 @@ int main() {
     
     // Initialize with random data
     for (size_t i = 0; i < N; ++i) {
-        data1[i] = vector<float, 3>(i * 0.1f, i * 0.2f, i * 0.3f);
-        data2[i] = vector<float, 3>(i * 0.4f, i * 0.5f, i * 0.6f);
-        data3[i] = vector<float, 3>(i * 0.7f, i * 0.8f, i * 0.9f);
+        data1[i] = vector<float, 3>(static_cast<float>(i) * 0.1f, static_cast<float>(i) * 0.2f, static_cast<float>(i) * 0.3f);
+        data2[i] = vector<float, 3>(static_cast<float>(i) * 0.4f, static_cast<float>(i) * 0.5f, static_cast<float>(i) * 0.6f);
+        data3[i] = vector<float, 3>(static_cast<float>(i) * 0.7f, static_cast<float>(i) * 0.8f, static_cast<float>(i) * 0.9f);
     }
     
     // Expression template version

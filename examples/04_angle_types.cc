@@ -126,7 +126,7 @@ int main() {
     
     std::cout << "Points on a unit circle:\n";
     for (int i = 0; i < num_points; ++i) {
-        auto angle = degree<float>(360.0f * i / num_points);
+        auto angle = degree<float>(360.0f * static_cast<float>(i) / static_cast<float>(num_points));
         float x = radius * cos(angle);
         float y = radius * sin(angle);
         

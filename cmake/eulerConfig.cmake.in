@@ -1,0 +1,26 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Find required dependencies
+find_dependency(failsafe REQUIRED)
+
+# XSIMD is optional
+if(@EULER_ENABLE_XSIMD@)
+    find_dependency(xsimd QUIET)
+endif()
+
+# Include the targets file
+include("${CMAKE_CURRENT_LIST_DIR}/eulerTargets.cmake")
+
+# Check that all required components are available
+check_required_components(euler)
+
+# Provide version information
+set(euler_VERSION @PROJECT_VERSION@)
+set(euler_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(euler_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(euler_VERSION_PATCH @PROJECT_VERSION_PATCH@)
+
+# Feature flags
+set(euler_XSIMD_SUPPORT @EULER_ENABLE_XSIMD@)

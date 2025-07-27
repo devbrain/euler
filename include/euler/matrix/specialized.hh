@@ -120,6 +120,7 @@ auto multiply_4x4_simd(const matrix<T, 4, 4>& a, const matrix<T, 4, 4>& b)
             case 1: b_col = b_col1; break;
             case 2: b_col = b_col2; break;
             case 3: b_col = b_col3; break;
+            default: b_col = b_col0; break; // Should never happen
         }
         
         // Compute result column j by linear combination of a's columns
@@ -161,7 +162,7 @@ constexpr T fast_determinant_2x2(const matrix<T, 2, 2>& m) {
 
 // Fast 3x3 determinant with co-factor expansion
 template<typename T>
-T fast_determinant_3x3(const matrix<T, 3, 3>& m) {
+constexpr T fast_determinant_3x3(const matrix<T, 3, 3>& m) {
 #ifdef EULER_HAS_SIMD
     if constexpr (std::is_same_v<T, float>) {
         // SIMD optimized version
@@ -197,7 +198,7 @@ T fast_determinant_3x3(const matrix<T, 3, 3>& m) {
 
 // Fast 4x4 determinant using sub-determinants
 template<typename T>
-T fast_determinant_4x4(const matrix<T, 4, 4>& m) {
+constexpr T fast_determinant_4x4(const matrix<T, 4, 4>& m) {
     // Pre-compute 2x2 sub-determinants for efficiency
     T sub23_01 = m(2,0) * m(3,1) - m(2,1) * m(3,0);
     T sub23_02 = m(2,0) * m(3,2) - m(2,2) * m(3,0);

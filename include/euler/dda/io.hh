@@ -34,14 +34,14 @@ namespace euler::dda {
 
 // Stream output for pixel type
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const pixel<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const pixel<T>& p) {
     // Pixels output the same as points since they implicitly convert
     return os << p.pos;
 }
 
 // Stream output for antialiased pixel type
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const aa_pixel<T>& p) {
+inline std::ostream& operator<<(std::ostream& os, const aa_pixel<T>& p) {
     // Save stream state
     std::ios_base::fmtflags flags(os.flags());
     std::streamsize precision = os.precision();
@@ -71,13 +71,13 @@ std::ostream& operator<<(std::ostream& os, const aa_pixel<T>& p) {
 }
 
 // Stream output for span type
-std::ostream& operator<<(std::ostream& os, const span& s) {
+inline std::ostream& operator<<(std::ostream& os, const span& s) {
     return os << "span(y: " << s.y << ", x: [" << s.x_start << ", " << s.x_end << "])";
 }
 
 // Stream output for rectangle type
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const rectangle<T>& r) {
+inline std::ostream& operator<<(std::ostream& os, const rectangle<T>& r) {
     return os << '[' << r.min << " - " << r.max << ']';
 }
 

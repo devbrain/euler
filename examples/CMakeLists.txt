@@ -20,7 +20,7 @@ set(EXAMPLE_PROGRAMS
 # Create executable for each example
 foreach(example ${EXAMPLE_PROGRAMS})
     add_executable(${example} ${example}.cc)
-    target_link_libraries(${example} PRIVATE euler)
+    target_link_libraries(${example} PRIVATE euler::euler)
     
     # Set output directory for examples
     set_target_properties(${example} PROPERTIES
@@ -118,7 +118,7 @@ if(PkgConfig_FOUND)
         # Link libraries
         target_link_libraries(dda_imgui_demo PRIVATE
             ${SDL_LIBRARIES}
-            euler
+            euler::euler
         )
 
         # Set compile options

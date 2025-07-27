@@ -162,7 +162,7 @@ int main() {
         }
     }
     
-    float pi_estimate = 4.0f * inside_circle / num_samples;
+    float pi_estimate = 4.0f * static_cast<float>(inside_circle) / static_cast<float>(num_samples);
     std::cout << "Samples: " << num_samples << "\n";
     std::cout << "Points in circle: " << inside_circle << "\n";
     std::cout << "π estimate: " << pi_estimate << "\n";

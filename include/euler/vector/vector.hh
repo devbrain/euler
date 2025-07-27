@@ -143,7 +143,7 @@ public:
     std::enable_if_t<M >= 4, const_reference> a() const { return w(); }
     
     // Length/magnitude operations
-    T length_squared() const {
+    constexpr T length_squared() const {
         T sum = T(0);
         for (size_t i = 0; i < N; ++i) {
             sum += (*this)[i] * (*this)[i];
@@ -171,38 +171,38 @@ public:
     }
     
     // Factory methods
-    static vector zero() {
+    static constexpr vector zero() {
         return vector(T(0));
     }
     
-    static vector ones() {
+    static constexpr vector ones() {
         return vector(T(1));
     }
     
     // Unit vectors for common dimensions
     template<size_t M = N>
-    static std::enable_if_t<M >= 1, vector> unit_x() {
+    static constexpr std::enable_if_t<M >= 1, vector> unit_x() {
         vector v = zero();
         v.x() = T(1);
         return v;
     }
     
     template<size_t M = N>
-    static std::enable_if_t<M >= 2, vector> unit_y() {
+    static constexpr std::enable_if_t<M >= 2, vector> unit_y() {
         vector v = zero();
         v.y() = T(1);
         return v;
     }
     
     template<size_t M = N>
-    static std::enable_if_t<M >= 3, vector> unit_z() {
+    static constexpr std::enable_if_t<M >= 3, vector> unit_z() {
         vector v = zero();
         v.z() = T(1);
         return v;
     }
     
     template<size_t M = N>
-    static std::enable_if_t<M >= 4, vector> unit_w() {
+    static constexpr std::enable_if_t<M >= 4, vector> unit_w() {
         vector v = zero();
         v.w() = T(1);
         return v;

@@ -27,7 +27,7 @@ public:
     // Constructor from raw data with dimensions and strides
     matrix_view(T* data, size_t rows, size_t cols, 
                 size_t row_stride = 1, size_t col_stride = 0,
-                bool expect_aligned = true) noexcept
+                [[maybe_unused]] bool expect_aligned = true) noexcept
         : data_(data), rows_(rows), cols_(cols),
           row_stride_(row_stride),
           col_stride_(col_stride == 0 ? rows : col_stride) {

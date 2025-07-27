@@ -95,9 +95,11 @@ quaternion<T> random_quaternion_axis(Generator& g,
                                     const vector<T, 3>& axis,
                                     const angle<T, radian_tag>& min_angle = angle<T, radian_tag>(0),
                                     const angle<T, radian_tag>& max_angle = angle<T, radian_tag>(2 * constants<T>::pi)) {
+    #ifdef EULER_DEBUG
     EULER_CHECK(approx_equal(axis.length_squared(), T(1), T(1e-6)),
                 error_code::invalid_argument,
                 "random_quaternion_axis: axis must be normalized");
+    #endif
     
     angle<T, radian_tag> theta = random_angle<T, radian_tag>(g, min_angle, max_angle);
     return quaternion<T>::from_axis_angle(axis, theta);

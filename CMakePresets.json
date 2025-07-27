@@ -1,0 +1,173 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "EULER_DEVELOPER_MODE": "ON",
+                "EULER_ENABLE_COVERAGE": "OFF",
+                "EULER_ENABLE_SANITIZERS": "OFF"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "EULER_DEVELOPER_MODE": "OFF",
+                "EULER_BUILD_TESTS": "OFF",
+                "EULER_BUILD_EXAMPLES": "OFF",
+                "EULER_BUILD_BENCHMARKS": "OFF"
+            }
+        },
+        {
+            "name": "release-with-debug",
+            "displayName": "Release with Debug Info",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "EULER_DEVELOPER_MODE": "OFF"
+            }
+        },
+        {
+            "name": "ci",
+            "displayName": "CI Build",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "EULER_BUILD_TESTS": "ON",
+                "EULER_BUILD_EXAMPLES": "ON",
+                "EULER_BUILD_BENCHMARKS": "ON",
+                "EULER_BUILD_DOCUMENTATION": "OFF",
+                "EULER_DEVELOPER_MODE": "ON"
+            }
+        },
+        {
+            "name": "coverage",
+            "displayName": "Coverage",
+            "inherits": "debug",
+            "cacheVariables": {
+                "EULER_ENABLE_COVERAGE": "ON",
+                "CMAKE_CXX_FLAGS": "-fprofile-arcs -ftest-coverage"
+            }
+        },
+        {
+            "name": "asan",
+            "displayName": "Address Sanitizer",
+            "inherits": "debug",
+            "cacheVariables": {
+                "EULER_ENABLE_SANITIZERS": "ON",
+                "CMAKE_CXX_FLAGS": "-fsanitize=address -fno-omit-frame-pointer"
+            }
+        },
+        {
+            "name": "ubsan",
+            "displayName": "Undefined Behavior Sanitizer",
+            "inherits": "debug",
+            "cacheVariables": {
+                "EULER_ENABLE_SANITIZERS": "ON",
+                "CMAKE_CXX_FLAGS": "-fsanitize=undefined"
+            }
+        },
+        {
+            "name": "tsan",
+            "displayName": "Thread Sanitizer",
+            "inherits": "debug",
+            "cacheVariables": {
+                "EULER_ENABLE_SANITIZERS": "ON",
+                "CMAKE_CXX_FLAGS": "-fsanitize=thread"
+            }
+        },
+        {
+            "name": "benchmark",
+            "displayName": "Benchmark",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "EULER_BUILD_TESTS": "OFF",
+                "EULER_BUILD_EXAMPLES": "OFF",
+                "EULER_BUILD_BENCHMARKS": "ON",
+                "CMAKE_CXX_FLAGS": "-march=native"
+            }
+        },
+        {
+            "name": "docs",
+            "displayName": "Documentation Only",
+            "inherits": "base",
+            "cacheVariables": {
+                "EULER_BUILD_TESTS": "OFF",
+                "EULER_BUILD_EXAMPLES": "OFF",
+                "EULER_BUILD_BENCHMARKS": "OFF",
+                "EULER_BUILD_DOCUMENTATION": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "ci",
+            "configurePreset": "ci"
+        },
+        {
+            "name": "coverage",
+            "configurePreset": "coverage"
+        },
+        {
+            "name": "benchmark",
+            "configurePreset": "benchmark"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "ci",
+            "configurePreset": "ci",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 4,
+                "timeout": 300
+            }
+        },
+        {
+            "name": "coverage",
+            "configurePreset": "coverage",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}

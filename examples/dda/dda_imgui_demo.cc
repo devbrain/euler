@@ -380,6 +380,8 @@ private:
             case VisualizationState::ALGO_MATH_CURVES:
                 drawMathCurveControls();
                 break;
+            default:
+                break;
         }
         
         // Antialiasing options
@@ -589,6 +591,8 @@ private:
                 changed |= ImGui::DragFloat("B", &state.math_param_b, 0.5f, 0.1f, 50.0f);
                 changed |= ImGui::SliderInt("n", &state.math_param_n, 1, 10);
                 break;
+            default:
+                break;
         }
         
         if (changed) updatePixels();
@@ -659,6 +663,8 @@ private:
                 break;
             case VisualizationState::ALGO_MATH_CURVES:
                 updateMathCurvePixels();
+                break;
+            default:
                 break;
         }
     }
@@ -1136,6 +1142,8 @@ private:
                 }
                 break;
             }
+            default:
+                break;
         }
     }
     

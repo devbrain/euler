@@ -147,7 +147,7 @@ int main() {
     std::cout << "6th roots of unity:\n";
     
     for (int k = 0; k < n; ++k) {
-        auto angle = radian<float>(2.0f * constants<float>::pi * k / n);
+        auto angle = radian<float>(2.0f * constants<float>::pi * static_cast<float>(k) / static_cast<float>(n));
         auto root = complex<float>::polar(1.0f, angle);
         
         std::cout << "  k=" << k << ": ";

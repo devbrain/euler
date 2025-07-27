@@ -47,8 +47,8 @@
 #include <euler/coordinates/point_ops.hh>
 #include <euler/vector/vector_ops.hh>
 #include <euler/dda/dda_math.hh>
-#include <euler/core/simd.hh>
 #include <euler/core/compiler.hh>
+#include <euler/core/simd.hh>
 #include <euler/dda/aa_simd.hh>
 #include <algorithm>
 #include <vector>
@@ -557,13 +557,13 @@ private:
         powers_t[0] = T(1);
         powers_one_minus_t[0] = T(1);
         
-        for (int i = 1; i <= degree_; ++i) {
+        for (int i = 1; i < degree_ + 1; ++i) {
             powers_t[static_cast<size_t>(i)] = powers_t[static_cast<size_t>(i-1)] * t;
             powers_one_minus_t[static_cast<size_t>(i)] = powers_one_minus_t[static_cast<size_t>(i-1)] * one_minus_t;
         }
         
         EULER_LOOP_VECTORIZE
-        for (int i = 0; i <= degree_; ++i) {
+        for (int i = 0; i < degree_ + 1; ++i) {
             T basis = binomial_coeffs_[static_cast<size_t>(i)] * 
                      powers_one_minus_t[static_cast<size_t>(degree_ - i)] * 
                      powers_t[static_cast<size_t>(i)];
@@ -575,6 +575,8 @@ private:
     }
     
 #ifdef EULER_HAS_XSIMD
+    EULER_DISABLE_WARNING_PUSH
+    EULER_DISABLE_WARNING_STRICT_OVERFLOW
     point2<T> evaluate_simd(T t) const {
         using batch_t = typename simd_traits<T>::batch_type;
         constexpr size_t simd_size = simd_traits<T>::batch_size;
@@ -588,7 +590,7 @@ private:
         powers_t[0] = T(1);
         powers_one_minus_t[0] = T(1);
         
-        for (int i = 1; i <= degree_; ++i) {
+        for (int i = 1; i < degree_ + 1; ++i) {
             powers_t[static_cast<size_t>(i)] = powers_t[static_cast<size_t>(i-1)] * t;
             powers_one_minus_t[static_cast<size_t>(i)] = powers_one_minus_t[static_cast<size_t>(i-1)] * one_minus_t;
         }
@@ -603,7 +605,9 @@ private:
             alignas(simd_alignment_v<T>::value) T x_data[simd_size];
             alignas(simd_alignment_v<T>::value) T y_data[simd_size];
             
-            for (; i + static_cast<int>(simd_size) <= degree_ + 1; i += static_cast<int>(simd_size)) {
+            const int total_points = degree_ + 1;
+            const int simd_step = static_cast<int>(simd_size);
+            for (; i <= total_points - simd_step; i += simd_step) {
                 // Compute basis functions for this batch
                 for (size_t j = 0; j < simd_size; ++j) {
                     int idx = i + static_cast<int>(j);
@@ -627,16 +631,20 @@ private:
         }
         
         // Handle remaining control points
-        for (; i <= degree_; ++i) {
-            T basis = binomial_coeffs_[static_cast<size_t>(i)] * 
-                     powers_one_minus_t[static_cast<size_t>(degree_ - i)] * 
-                     powers_t[static_cast<size_t>(i)];
-            result_x += basis * control_points_[static_cast<size_t>(i)].x;
-            result_y += basis * control_points_[static_cast<size_t>(i)].y;
+        const int remaining = degree_ + 1 - i;
+        for (int j = 0; j < remaining; ++j) {
+            const int idx = i + j;
+            const int power_idx = degree_ - idx;
+            T basis = binomial_coeffs_[static_cast<size_t>(idx)] * 
+                     powers_one_minus_t[static_cast<size_t>(power_idx)] * 
+                     powers_t[static_cast<size_t>(idx)];
+            result_x += basis * control_points_[static_cast<size_t>(idx)].x;
+            result_y += basis * control_points_[static_cast<size_t>(idx)].y;
         }
         
         return point2<T>{result_x, result_y};
     }
+    EULER_DISABLE_WARNING_POP
 #endif
     
 public:

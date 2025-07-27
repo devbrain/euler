@@ -114,9 +114,11 @@ public:
     template<typename Unit>
     static quaternion from_axis_angle(const vector<T, 3>& axis, 
                                      const angle<T, Unit>& theta) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(approx_equal(axis.length_squared(), T(1), T(1e-6)),
                     error_code::invalid_argument,
                     "quaternion::from_axis_angle: axis must be normalized");
+        #endif
         
         radian<T> half_angle = theta / T(2);
         T s = sin(half_angle);
@@ -259,12 +261,14 @@ public:
     
     // From rotation from one vector to another
     static quaternion from_vectors(const vector<T, 3>& from, const vector<T, 3>& to) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(approx_equal(from.length_squared(), T(1), T(1e-6)),
                     error_code::invalid_argument,
                     "quaternion::from_vectors: 'from' must be normalized");
         EULER_CHECK(approx_equal(to.length_squared(), T(1), T(1e-6)),
                     error_code::invalid_argument,
                     "quaternion::from_vectors: 'to' must be normalized");
+        #endif
         
         T d = dot(from, to);
         
@@ -380,8 +384,10 @@ public:
     // Normalize in place
     quaternion& normalize() {
         T len = norm();
+        #ifdef EULER_DEBUG
         EULER_CHECK(len > constants<T>::epsilon, error_code::invalid_argument,
                     "quaternion::normalize: cannot normalize zero quaternion");
+        #endif
         
         T inv_len = T(1) / len;
         w_ *= inv_len;
@@ -596,15 +602,19 @@ public:
     
     // Scalar division
     quaternion operator/(T s) const {
+        #ifdef EULER_DEBUG
         EULER_CHECK(std::abs(s) > constants<T>::epsilon, error_code::invalid_argument,
                     "quaternion: division by zero");
+        #endif
         T inv_s = T(1) / s;
         return quaternion(w_ * inv_s, x_ * inv_s, y_ * inv_s, z_ * inv_s);
     }
     
     quaternion& operator/=(T s) {
+        #ifdef EULER_DEBUG
         EULER_CHECK(std::abs(s) > constants<T>::epsilon, error_code::invalid_argument,
                     "quaternion: division by zero");
+        #endif
         T inv_s = T(1) / s;
         w_ *= inv_s;
         x_ *= inv_s;
