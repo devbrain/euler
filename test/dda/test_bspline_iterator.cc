@@ -1,12 +1,15 @@
 #include <doctest/doctest.h>
 #include <euler/dda/bspline_iterator.hh>
 #include <euler/coordinates/point2.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <cmath>
 
 using namespace euler;
 using namespace euler::dda;
 
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("B-spline iterator basic functionality") {
     SUBCASE("Cubic B-spline with 4 control points") {
         std::vector<point2f> control_points = {
@@ -291,3 +294,4 @@ TEST_CASE("B-spline edge cases") {
         }
     }
 }
+EULER_DISABLE_WARNING_POP

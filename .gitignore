@@ -41,6 +41,6 @@
 *.dwo
 
 build
-.ideaa
+.idea
 cmake-build-debug
 cmake-build-release

@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
 #include <euler/matrix/matrix.hh>
 #include <euler/matrix/matrix_ops.hh>
-#include <euler/matrix/scalar_matrix_expr.hh>
+// scalar_matrix_expr is already included via matrix_ops.hh
 #include <euler/core/approx_equal.hh>
 #include <cmath>
 
@@ -66,8 +66,12 @@ TEST_CASE("Scalar-matrix operations") {
         // (20 - m) / 2
         auto result = (20.0f - m) / 2.0f;
         matrix<float, 2, 2> expected{{9.5f, 9.0f}, {8.5f, 8.0f}};
-        
-        CHECK(approx_equal(matrix<float, 2, 2>(result), expected));
+
+        matrix<float, 2, 2> actual(result);
+        MESSAGE("Actual result: " << actual(0,0) << " " << actual(0,1) << " " << actual(1,0) << " " << actual(1,1));
+        MESSAGE("Expected: " << expected(0,0) << " " << expected(0,1) << " " << expected(1,0) << " " << expected(1,1));
+
+        CHECK(approx_equal(actual, expected));
     }
     
     SUBCASE("Scalar operations with matrix expressions") {

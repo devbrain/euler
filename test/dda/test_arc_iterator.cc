@@ -4,6 +4,7 @@
 #include <euler/dda/ellipse_iterator.hh>
 #include <euler/angles/angle.hh>
 #include <euler/coordinates/point2.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <cmath>
 
@@ -116,6 +117,8 @@ TEST_CASE("Arc iterators") {
         CHECK(has_q4);
     }
     
+    EULER_DISABLE_WARNING_PUSH
+    EULER_DISABLE_WARNING_STRICT_OVERFLOW
     SUBCASE("Filled arc vertical line bug") {
         // Test case that was causing vertical line on y axis
         point2f center{50, 50};
@@ -196,4 +199,5 @@ TEST_CASE("Arc iterators") {
             CHECK(s.y >= static_cast<int>(center.y));
         }
     }
+    EULER_DISABLE_WARNING_POP
 }

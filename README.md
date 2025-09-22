@@ -1,7 +1,7 @@
 # Euler Mathematical Library
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B17)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B20)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-brightgreen.svg)](https://your-docs-url.com)
 
 A modern C++ mathematical library featuring expression templates, SIMD optimization, and compile-time safety for high-performance scientific computing.
@@ -49,7 +49,7 @@ int main() {
 
 ### Requirements
 
-- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- C++20 compatible compiler (GCC 10+, Clang 10+, MSVC 2019 16.8+)
 - CMake 3.20 or higher
 - Optional: xsimd for SIMD optimization
 - Optional: Doxygen for documentation generation

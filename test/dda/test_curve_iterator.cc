@@ -3,12 +3,15 @@
 #include <euler/dda/mathematical_curves.hh>
 #include <euler/coordinates/point2.hh>
 #include <euler/math/trigonometry.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <cmath>
 
 using namespace euler;
 using namespace euler::dda;
 
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("Curve iterator basic functionality") {
     SUBCASE("Parametric curve - circle") {
         // Parametric circle
@@ -297,3 +300,4 @@ TEST_CASE("Curve iterator edge cases") {
         CHECK(count < 10000); // But not infinite
     }
 }
+EULER_DISABLE_WARNING_POP

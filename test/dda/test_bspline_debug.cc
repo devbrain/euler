@@ -1,12 +1,15 @@
 #include <doctest/doctest.h>
 #include <euler/dda/bspline_iterator.hh>
 #include <euler/coordinates/point2.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <iostream>
 
 using namespace euler;
 using namespace euler::dda;
 
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("Debug B-spline end point issue") {
     SUBCASE("Cubic B-spline with 5 control points") {
         // Create control points
@@ -134,3 +137,4 @@ TEST_CASE("Debug B-spline end point issue") {
         CHECK(dist_last < 2.0f);
     }
 }
+EULER_DISABLE_WARNING_POP

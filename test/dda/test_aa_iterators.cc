@@ -1,5 +1,6 @@
 #include <euler/dda/dda.hh>
 #include <doctest/doctest.h>
+#include <euler/core/compiler.hh>
 #include <cmath>
 #include <vector>
 
@@ -7,6 +8,8 @@ using namespace euler;
 using namespace euler::dda;
 
 // Test that AA curve iterator compiles and generates pixels
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("AA curve iterator") {
     // Test parametric curve - a small arc instead of full circle
     auto circle = [](float t) -> point2<float> {
@@ -171,3 +174,4 @@ TEST_CASE("AA edge cases") {
     }
     CHECK(count > 10);  // Should generate pixels along the line
 }
+EULER_DISABLE_WARNING_POP

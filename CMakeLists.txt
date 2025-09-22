@@ -14,7 +14,7 @@ include(CMakePackageConfigHelpers)
 include(CTest)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -195,14 +195,14 @@ if(EULER_ENABLE_INSTALL)
         COMPONENT Development
     )
     
-    # Export for build tree
-    export(EXPORT eulerTargets
-        FILE ${CMAKE_CURRENT_BINARY_DIR}/eulerTargets.cmake
-        NAMESPACE euler::
-    )
-    
+    # Export for build tree - disabled due to dependency issues
+    # export(EXPORT eulerTargets
+    #     FILE ${CMAKE_CURRENT_BINARY_DIR}/eulerTargets.cmake
+    #     NAMESPACE euler::
+    # )
+
     # Register package in user registry
-    export(PACKAGE euler)
+    # export(PACKAGE euler)
 endif()
 
 # CPack configuration

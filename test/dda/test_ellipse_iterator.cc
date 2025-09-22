@@ -4,6 +4,7 @@
 #include <euler/coordinates/point2.hh>
 #include <euler/angles/degree.hh>
 #include <euler/angles/radian.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <unordered_set>
 #include <cmath>
@@ -22,6 +23,8 @@ namespace std {
 using namespace euler;
 using namespace euler::dda;
 
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("Ellipse iterator basic functionality") {
     SUBCASE("Axis-aligned ellipse") {
         std::unordered_set<point2i> pixels;
@@ -289,3 +292,4 @@ TEST_CASE("Antialiased ellipse iterator") {
         CHECK(edge_ratio <= 1.0f); // Just check it's valid
     }
 }
+EULER_DISABLE_WARNING_POP

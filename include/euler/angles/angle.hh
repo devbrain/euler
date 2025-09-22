@@ -39,6 +39,7 @@
 #pragma once
 
 #include <euler/core/types.hh>
+#include <compare>
 #include <euler/core/error.hh>
 #include <type_traits>
 #include <cmath>
@@ -358,30 +359,11 @@ public:
         return temp;
     }
     
-    // Comparison operators
-    constexpr bool operator==(const angle& rhs) const {
-        return value_ == rhs.value_;
-    }
-    
-    constexpr bool operator!=(const angle& rhs) const {
-        return value_ != rhs.value_;
-    }
-    
-    constexpr bool operator<(const angle& rhs) const {
-        return value_ < rhs.value_;
-    }
-    
-    constexpr bool operator<=(const angle& rhs) const {
-        return value_ <= rhs.value_;
-    }
-    
-    constexpr bool operator>(const angle& rhs) const {
-        return value_ > rhs.value_;
-    }
-    
-    constexpr bool operator>=(const angle& rhs) const {
-        return value_ >= rhs.value_;
-    }
+    // C++20 Three-way comparison operator
+    constexpr auto operator<=>(const angle& rhs) const = default;
+
+    // Equality comparison (can use default in C++20)
+    constexpr bool operator==(const angle& rhs) const = default;
 
 private:
     T value_{};

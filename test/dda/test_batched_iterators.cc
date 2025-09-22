@@ -1,6 +1,7 @@
 #include <doctest/doctest.h>
 #include <euler/dda/batched_iterators.hh>
 #include <euler/dda/dda.hh>
+#include <euler/core/compiler.hh>
 #include <vector>
 #include <unordered_set>
 #include <cmath>
@@ -38,6 +39,8 @@ std::vector<point2i> collect_pixels_regular(T start, T end) {
     return pixels;
 }
 
+EULER_DISABLE_WARNING_PUSH
+EULER_DISABLE_WARNING_STRICT_OVERFLOW
 TEST_CASE("Batched line iterator") {
     SUBCASE("Horizontal line") {
         point2f start{0.0f, 0.0f};
@@ -504,3 +507,4 @@ TEST_CASE("Prefetching and performance features") {
         CHECK(total_pixels == 100);
     }
 }
+EULER_DISABLE_WARNING_POP
