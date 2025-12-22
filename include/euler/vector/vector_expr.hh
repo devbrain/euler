@@ -32,7 +32,8 @@ class custom_unary_expr : public expression<custom_unary_expr<Expr, Op>, typenam
 public:
     using value_type = typename Expr::value_type;
     using expr_storage = typename expression_storage<Expr>::type;
-    
+    static constexpr size_t static_size = Expr::static_size;
+
     custom_unary_expr(const Expr& expr, Op op) : expr_(expr), op_(op) {}
     
     value_type eval_scalar(size_t idx) const {
@@ -64,7 +65,8 @@ public:
     using value_type = typename Expr1::value_type;
     using expr1_storage = typename expression_storage<Expr1>::type;
     using expr2_storage = typename expression_storage<Expr2>::type;
-    
+    static constexpr size_t static_size = Expr1::static_size > 0 ? Expr1::static_size : Expr2::static_size;
+
     custom_binary_expr(const Expr1& e1, const Expr2& e2, Op op) 
         : expr1_(e1), expr2_(e2), op_(op) {}
     
@@ -111,6 +113,7 @@ public:
     using value_type = typename Expr::value_type;
     using expr_storage = typename expression_storage<Expr>::type;
     static constexpr size_t size = Size;
+    static constexpr size_t static_size = Size;
     
     explicit normalized_expr(const Expr& expr) : expr_(expr) {
         // Compute length once
@@ -141,7 +144,8 @@ template<typename Expr, typename T>
 class scalar_vector_multiply_expr : public expression<scalar_vector_multiply_expr<Expr, T>, T> {
 public:
     using value_type = T;
-    
+    static constexpr size_t static_size = Expr::static_size;
+
     scalar_vector_multiply_expr(T scalar_value, const Expr& expr) 
         : scalar_(scalar_value), expr_(expr) {}
     
@@ -163,7 +167,8 @@ template<typename Vec1, typename Vec2, typename Vec3>
 class dot_multiply_expr : public expression<dot_multiply_expr<Vec1, Vec2, Vec3>, typename Vec1::value_type> {
 public:
     using value_type = typename Vec1::value_type;
-    
+    static constexpr size_t static_size = Vec3::static_size;
+
     dot_multiply_expr(const Vec1& v1, const Vec2& v2, const Vec3& v3)
         : dot_result_(dot(v1, v2)), v3_(v3) {}
     
@@ -187,7 +192,8 @@ public:
     using value_type = typename Vec1::value_type;
     using vec1_storage = typename expression_storage<Vec1>::type;
     using vec2_storage = typename expression_storage<Vec2>::type;
-    
+    static constexpr size_t static_size = 3;  // Cross product is always 3D
+
     cross_product_expr(const Vec1& a, const Vec2& b)
         : a_(a), b_(b) {}
     
@@ -221,7 +227,8 @@ public:
     using value_type = typename Vec::value_type;
     using vec_storage = typename expression_storage<Vec>::type;
     using normal_storage = typename expression_storage<Normal>::type;
-    
+    static constexpr size_t static_size = Vec::static_size;
+
     reflect_expr(const Vec& incident, const Normal& normal)
         : incident_(incident), normal_(normal) {
         // Compute 2 * dot(incident, normal) once
@@ -249,7 +256,8 @@ public:
     using value_type = T;
     using vec1_storage = typename expression_storage<Vec1>::type;
     using vec2_storage = typename expression_storage<Vec2>::type;
-    
+    static constexpr size_t static_size = Vec1::static_size;
+
     lerp_expr(const Vec1& a, const Vec2& b, T t)
         : a_(a), b_(b), t_(t), one_minus_t_(T(1) - t) {}
     
@@ -275,7 +283,8 @@ public:
     using value_type = typename Vec1::value_type;
     using vec1_storage = typename expression_storage<Vec1>::type;
     using vec2_storage = typename expression_storage<Vec2>::type;
-    
+    static constexpr size_t static_size = Vec1::static_size;
+
     min_expr(const Vec1& a, const Vec2& b) : a_(a), b_(b) {}
     
     value_type eval_scalar(size_t idx) const {
@@ -298,7 +307,8 @@ public:
     using value_type = typename Vec1::value_type;
     using vec1_storage = typename expression_storage<Vec1>::type;
     using vec2_storage = typename expression_storage<Vec2>::type;
-    
+    static constexpr size_t static_size = Vec1::static_size;
+
     max_expr(const Vec1& a, const Vec2& b) : a_(a), b_(b) {}
     
     value_type eval_scalar(size_t idx) const {
@@ -320,7 +330,8 @@ class abs_expr : public vector_expression_base<abs_expr<Vec>, typename Vec::valu
 public:
     using value_type = typename Vec::value_type;
     using vec_storage = typename expression_storage<Vec>::type;
-    
+    static constexpr size_t static_size = Vec::static_size;
+
     abs_expr(const Vec& v) : v_(v) {}
     
     value_type eval_scalar(size_t idx) const {
@@ -343,7 +354,8 @@ public:
     using vec_storage = typename expression_storage<Vec>::type;
     using min_storage = typename std::conditional<std::is_arithmetic_v<Min>, Min, const Min&>::type;
     using max_storage = typename std::conditional<std::is_arithmetic_v<Max>, Max, const Max&>::type;
-    
+    static constexpr size_t static_size = Vec::static_size;
+
     clamp_expr(const Vec& v, const Min& min_val, const Max& max_val)
         : v_(v), min_val_(min_val), max_val_(max_val) {}
     
@@ -393,7 +405,8 @@ public:
     using value_type = typename Vec1::value_type;
     using vec1_storage = typename expression_storage<Vec1>::type;
     using vec2_storage = typename expression_storage<Vec2>::type;
-    
+    static constexpr size_t static_size = Vec1::static_size;
+
     project_expr(const Vec1& a, const Vec2& b) : a_(a), b_(b) {
         // Precompute dot(a,b) / length_squared(b)
         value_type b_len_sq = dot(b, b);
@@ -420,7 +433,8 @@ class faceforward_expr : public vector_expression_base<faceforward_expr<Vec, Inc
 public:
     using value_type = typename Vec::value_type;
     using vec_storage = typename expression_storage<Vec>::type;
-    
+    static constexpr size_t static_size = Vec::static_size;
+
     faceforward_expr(const Vec& n, const Incident& i, const Normal& nref) 
         : n_(n), sign_(dot(i, nref) < value_type(0) ? value_type(1) : value_type(-1)) {}
     

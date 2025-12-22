@@ -121,7 +121,8 @@ public:
     static constexpr size_t rows = expression_traits<Expr1>::rows;
     static constexpr size_t cols = expression_traits<Expr1>::cols;
     static constexpr bool row_major = expression_traits<Expr1>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     static_assert(expression_traits<Expr1>::rows == expression_traits<Expr2>::rows,
                   "Matrix dimensions must match for binary operations");
     static_assert(expression_traits<Expr1>::cols == expression_traits<Expr2>::cols,
@@ -228,7 +229,8 @@ public:
     static constexpr size_t rows = expression_traits<Expr>::rows;
     static constexpr size_t cols = expression_traits<Expr>::cols;
     static constexpr bool row_major = expression_traits<Expr>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     constexpr matrix_scalar_expression(const Expr& expr, Scalar ascalar)
         : expr_(expr), scalar_(ascalar) {}
     
@@ -315,11 +317,12 @@ class matrix_unary_expression : public expression<matrix_unary_expression<Expr, 
 public:
     using value_type = typename expression_traits<Expr>::value_type;
     using expr_storage = typename expression_storage<Expr>::type;
-    
+
     static constexpr size_t rows = expression_traits<Expr>::rows;
     static constexpr size_t cols = expression_traits<Expr>::cols;
     static constexpr bool row_major = expression_traits<Expr>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     constexpr explicit matrix_unary_expression(const Expr& expr)
         : expr_(expr) {}
     
@@ -396,11 +399,12 @@ class matrix_transpose_expression : public expression<matrix_transpose_expressio
 public:
     using value_type = typename expression_traits<Expr>::value_type;
     using expr_storage = typename expression_storage<Expr>::type;
-    
+
     static constexpr size_t rows = expression_traits<Expr>::cols;  // Swapped
     static constexpr size_t cols = expression_traits<Expr>::rows;  // Swapped
     static constexpr bool row_major = expression_traits<Expr>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     constexpr explicit matrix_transpose_expression(const Expr& expr)
         : expr_(expr) {}
     
@@ -598,7 +602,8 @@ public:
     static constexpr size_t rows = expression_traits<Expr1>::rows;
     static constexpr size_t cols = expression_traits<Expr2>::cols;
     static constexpr bool row_major = expression_traits<Expr1>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     // Inner dimension must match
     static_assert(expression_traits<Expr1>::cols == expression_traits<Expr2>::rows,
                   "Matrix dimensions must be compatible for multiplication");
@@ -724,11 +729,12 @@ class matrix_inverse_expression : public expression<matrix_inverse_expression<Ex
 public:
     using value_type = typename expression_traits<Expr>::value_type;
     using expr_storage = typename expression_storage<Expr>::type;
-    
+
     static constexpr size_t rows = expression_traits<Expr>::rows;
     static constexpr size_t cols = expression_traits<Expr>::cols;
     static constexpr bool row_major = expression_traits<Expr>::row_major;
-    
+    static constexpr size_t static_size = rows * cols;
+
     static_assert(rows == cols, "Inverse is only defined for square matrices");
     
     explicit matrix_inverse_expression(const Expr& expr)
@@ -833,11 +839,12 @@ public:
     using value_type = typename mat_traits::value_type;
     using mat_storage = typename expression_storage<MatExpr>::type;
     using vec_storage = typename expression_storage<VecExpr>::type;
-    
+
     static constexpr size_t rows = mat_traits::rows;
     static constexpr size_t cols = 1;  // Result is a column vector
     static constexpr bool row_major = true;
-    
+    static constexpr size_t static_size = rows;
+
     static_assert(mat_traits::cols == vec_traits::rows || mat_traits::cols == vec_traits::cols,
                   "Matrix columns must match vector size");
     
@@ -895,11 +902,12 @@ public:
     using value_type = typename vec_traits::value_type;
     using vec_storage = typename expression_storage<VecExpr>::type;
     using mat_storage = typename expression_storage<MatExpr>::type;
-    
+
     static constexpr size_t rows = 1;  // Result is a row vector
     static constexpr size_t cols = mat_traits::cols;
     static constexpr bool row_major = true;
-    
+    static constexpr size_t static_size = cols;
+
     static_assert(vec_traits::rows == mat_traits::rows || vec_traits::cols == mat_traits::rows,
                   "Vector size must match matrix rows");
     

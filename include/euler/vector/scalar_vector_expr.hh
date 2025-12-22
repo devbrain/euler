@@ -25,7 +25,8 @@ class scalar_vector_expression : public expression<scalar_vector_expression<Scal
 public:
     using value_type = std::common_type_t<Scalar, typename VecExpr::value_type>;
     static constexpr size_t size = vector_size_v<VecExpr>;
-    
+    static constexpr size_t static_size = vector_size_v<VecExpr>;
+
     constexpr scalar_vector_expression(const Scalar& s, const VecExpr& vec)
         : scalar_(s), vec_(vec) {}
     

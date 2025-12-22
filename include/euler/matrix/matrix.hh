@@ -64,7 +64,8 @@ public:
     static constexpr size_t rows = Rows;
     static constexpr size_t cols = Cols;
     static constexpr size_t size = Rows * Cols;
-    
+    static constexpr size_t static_size = Rows * Cols;  ///< Size for expression templates
+
     // Storage order
     static constexpr bool column_major = ColumnMajor;
     

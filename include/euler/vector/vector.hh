@@ -47,6 +47,7 @@ public:
     using const_reference = const T&;  ///< Const reference to component
     
     static constexpr size_t size = N;  ///< Number of components
+    static constexpr size_t static_size = N;  ///< Size for expression templates
     
     // Inherit constructors
     using base_type::base_type;
@@ -220,10 +221,11 @@ public:
     using const_reference = const T&;
     
     static constexpr size_t size = N;
-    
+    static constexpr size_t static_size = N;
+
     // Inherit constructors
     using base_type::base_type;
-    
+
     // Default constructor
     column_vector() = default;
     
@@ -260,12 +262,13 @@ public:
     using size_type = size_t;
     using reference = T&;
     using const_reference = const T&;
-    
+
     static constexpr size_t size = N;
-    
+    static constexpr size_t static_size = N;
+
     // Inherit constructors
     using base_type::base_type;
-    
+
     // Default constructor
     row_vector() = default;
     

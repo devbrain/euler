@@ -26,8 +26,8 @@ public:
     }
     
     // Size information (must be provided by derived class)
-    static constexpr size_t size() { 
-        return derived::size; 
+    static constexpr size_t size() {
+        return derived::static_size;
     }
     
     // Element access (delegates to derived class)
@@ -138,7 +138,7 @@ public:
     using value_type = typename left_expr::value_type;
     using left_storage = typename expression_storage<left_expr>::type;
     using right_storage = typename expression_storage<right_expr>::type;
-    static constexpr size_t size = left_expr::size > 0 ? left_expr::size : right_expr::size;
+    static constexpr size_t static_size = left_expr::static_size > 0 ? left_expr::static_size : right_expr::static_size;
     
     binary_expression(const left_expr& l, const right_expr& r) 
         : left(l), right(r) {}
@@ -163,7 +163,7 @@ class unary_expression : public expression<unary_expression<expr, op>,
 public:
     using value_type = typename expr::value_type;
     using expr_storage = typename expression_storage<expr>::type;
-    static constexpr size_t size = expr::size;
+    static constexpr size_t static_size = expr::static_size;
     
     unary_expression(const expr& operand_expr) : operand(operand_expr) {}
     
@@ -184,7 +184,7 @@ template<typename T>
 class scalar_expression : public expression<scalar_expression<T>, T> {
 public:
     using value_type = T;
-    static constexpr size_t size = 0; // Dynamic size - means scalar
+    static constexpr size_t static_size = 0; // Dynamic size - means scalar
     
     scalar_expression(T value) : val(value) {}
     
