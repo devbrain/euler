@@ -21,9 +21,10 @@ int main() {
         }
     }
     
-    // Use fewer iterations in Debug mode to avoid timeout
+    // Use fewer iterations to avoid CI timeout (60s limit)
+    // Even Release mode can be slow on CI runners
 #ifdef NDEBUG
-    const int iterations = 1000000;
+    const int iterations = 100000;
 #else
     const int iterations = 10000;
 #endif

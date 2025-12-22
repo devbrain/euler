@@ -134,59 +134,59 @@ TEST_CASE("Trigonometric functions") {
 TEST_CASE("Inverse trigonometric functions") {
     SUBCASE("asin function") {
         SUBCASE("scalar values") {
-            auto angle1 = asin(0.0f);
+            auto angle1 = euler::asin(0.0f);
             CHECK(approx_equal(angle1.value(), 0.0f));
-            
-            auto angle2 = asin(1.0f);
+
+            auto angle2 = euler::asin(1.0f);
             CHECK(approx_equal(angle2.value(), constants<float>::pi / 2));
-            
-            auto angle3 = asin(-1.0f);
+
+            auto angle3 = euler::asin(-1.0f);
             CHECK(approx_equal(angle3.value(), -constants<float>::pi / 2));
-            
+
             // Test degree version
-            auto angle_deg = asin_deg(0.5f);
+            auto angle_deg = euler::asin_deg(0.5f);
             CHECK(approx_equal(angle_deg.value(), 30.0f, 0.01f));
         }
-        
+
         SUBCASE("vector values") {
             vec3f v(0.0f, 0.5f, 1.0f);
-            auto result = asin(v);
+            auto result = euler::asin(v);
             CHECK(approx_equal(result[0].value(), 0.0f));
             CHECK(approx_equal(result[1].value(), std::asin(0.5f)));
             CHECK(approx_equal(result[2].value(), constants<float>::pi / 2));
         }
     }
-    
+
     SUBCASE("acos function") {
         SUBCASE("scalar values") {
-            auto angle1 = acos(1.0f);
+            auto angle1 = euler::acos(1.0f);
             CHECK(approx_equal(angle1.value(), 0.0f));
-            
-            auto angle2 = acos(0.0f);
+
+            auto angle2 = euler::acos(0.0f);
             CHECK(approx_equal(angle2.value(), constants<float>::pi / 2));
-            
-            auto angle3 = acos(-1.0f);
+
+            auto angle3 = euler::acos(-1.0f);
             CHECK(approx_equal(angle3.value(), constants<float>::pi));
-            
+
             // Test degree version
-            auto angle_deg = acos_deg(0.5f);
+            auto angle_deg = euler::acos_deg(0.5f);
             CHECK(approx_equal(angle_deg.value(), 60.0f, 0.01f));
         }
     }
-    
+
     SUBCASE("atan function") {
         SUBCASE("scalar values") {
-            auto angle1 = atan(0.0f);
+            auto angle1 = euler::atan(0.0f);
             CHECK(approx_equal(angle1.value(), 0.0f));
-            
-            auto angle2 = atan(1.0f);
+
+            auto angle2 = euler::atan(1.0f);
             CHECK(approx_equal(angle2.value(), constants<float>::pi / 4));
-            
-            auto angle3 = atan(-1.0f);
+
+            auto angle3 = euler::atan(-1.0f);
             CHECK(approx_equal(angle3.value(), -constants<float>::pi / 4));
-            
+
             // Test degree version
-            auto angle_deg = atan_deg(1.0f);
+            auto angle_deg = euler::atan_deg(1.0f);
             CHECK(approx_equal(angle_deg.value(), 45.0f, 0.01f));
         }
     }

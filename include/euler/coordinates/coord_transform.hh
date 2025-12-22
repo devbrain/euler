@@ -289,22 +289,22 @@ matrix<T, 4, 4> look_at(const point3<T>& eye, const point3<T>& center,
  * @brief Create perspective projection matrix
  * @param fovy Vertical field of view angle
  * @param aspect Aspect ratio (width/height)
- * @param near Near clipping plane distance
- * @param far Far clipping plane distance
+ * @param z_near Near clipping plane distance
+ * @param z_far Far clipping plane distance
  * @return 4x4 perspective projection matrix
  */
 template<typename Angle, typename T = typename Angle::value_type>
-matrix<T, 4, 4> perspective(const Angle& fovy, T aspect, T near, T far) {
+matrix<T, 4, 4> perspective(const Angle& fovy, T aspect, T z_near, T z_far) {
     static_assert(is_angle_v<Angle>, "perspective requires angle type");
     auto fovy_rad = to_radians(fovy);
     T f = T(1) / tan(fovy_rad / 2);
-    T nf = T(1) / (near - far);
-    
+    T nf = T(1) / (z_near - z_far);
+
     return {
-        {f/aspect,  0,                     0,  0},
-        {       0,  f,                     0,  0},
-        {       0,  0,     (far + near) * nf, 2 * far * near * nf},
-        {       0,  0,                    -1,  0}
+        {f/aspect,  0,                           0,  0},
+        {       0,  f,                           0,  0},
+        {       0,  0,     (z_far + z_near) * nf, 2 * z_far * z_near * nf},
+        {       0,  0,                          -1,  0}
     };
 }
 
@@ -314,21 +314,21 @@ matrix<T, 4, 4> perspective(const Angle& fovy, T aspect, T near, T far) {
  * @param right Right clipping plane
  * @param bottom Bottom clipping plane
  * @param top Top clipping plane
- * @param near Near clipping plane
- * @param far Far clipping plane
+ * @param z_near Near clipping plane
+ * @param z_far Far clipping plane
  * @return 4x4 orthographic projection matrix
  */
 template<typename T>
-matrix<T, 4, 4> ortho(T left, T right, T bottom, T top, T near, T far) {
+matrix<T, 4, 4> ortho(T left, T right, T bottom, T top, T z_near, T z_far) {
     T rl = T(1) / (right - left);
     T tb = T(1) / (top - bottom);
-    T fn = T(1) / (far - near);
-    
+    T fn = T(1) / (z_far - z_near);
+
     return {
         {2*rl,     0,     0, -(right + left) * rl},
         {   0,  2*tb,     0, -(top + bottom) * tb},
-        {   0,     0, -2*fn,   -(far + near) * fn},
-        {   0,     0,     0,                     1}
+        {   0,     0, -2*fn,   -(z_far + z_near) * fn},
+        {   0,     0,     0,                         1}
     };
 }
 
