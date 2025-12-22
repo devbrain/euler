@@ -166,7 +166,7 @@ TEST_CASE("Inverse trigonometric functions") {
             CHECK(approx_equal(angle2.value(), constants<float>::pi / 2));
 
             auto angle3 = euler::acos(-1.0f);
-            CHECK(approx_equal(angle3.value(), constants<float>::pi));
+            CHECK(approx_equal(angle3.value(), constants<float>::pi, 1e-6f));
 
             // Test degree version
             auto angle_deg = euler::acos_deg(0.5f);

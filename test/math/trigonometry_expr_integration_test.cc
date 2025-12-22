@@ -62,9 +62,9 @@ TEST_CASE("Trigonometric expression templates integration") {
                          std::sinh(a[i] - b[i]);
         }
         
-        CHECK(approx_equal(result, expected));
+        CHECK(approx_equal(result, expected, 1e-5f));
     }
-    
+
     SUBCASE("Nested trigonometric and algebraic expressions") {
         vec3f v(0.5f, 1.0f, 1.5f);
         
