@@ -10,19 +10,19 @@ template<typename T>
 class test_vector : public euler::expression<test_vector<T>, T> {
 public:
     using value_type = T;
-    static constexpr euler::size_t size = 4;
-    
+    static constexpr euler::size_t static_size = 4;
+
     test_vector() { data.fill(T(0)); }
     test_vector(T val) { data.fill(val); }
     test_vector(T a, T b, T c, T d) : data{a, b, c, d} {}
-    
+
     T eval_scalar(euler::size_t idx) const { return data[idx]; }
     T& operator[](euler::size_t idx) { return data[idx]; }
     const T& operator[](euler::size_t idx) const { return data[idx]; }
-    
+
     template<typename Expr>
     test_vector& operator=(const euler::expression<Expr, T>& expr) {
-        for (euler::size_t i = 0; i < size; ++i) {
+        for (euler::size_t i = 0; i < static_size; ++i) {
             data[i] = expr[i];
         }
         return *this;

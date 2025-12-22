@@ -94,8 +94,19 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Run tests
-        run: ctest --test-dir build --build-config Release --output-on-failure
+      - name: Run tests (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd build
+          ./test/euler_unittest --duration=true 2>&1 || true
+          ctest --build-config Release --output-on-failure
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd build
+          .\test\Release\euler_unittest.exe --duration=true 2>&1
+          ctest --build-config Release --output-on-failure
 
   debug:
     runs-on: ubuntu-latest
@@ -122,4 +133,7 @@ jobs:
         run: cmake --build build --config Debug
 
       - name: Run tests
-        run: ctest --test-dir build --build-config Debug --output-on-failure
+        run: |
+          cd build
+          ./test/euler_unittest --duration=true 2>&1 || true
+          ctest --build-config Debug --output-on-failure
