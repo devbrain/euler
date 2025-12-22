@@ -1,5 +1,6 @@
 # Euler Mathematical Library
 
+[![CI](https://github.com/devbrain/euler/actions/workflows/ci.yml/badge.svg)](https://github.com/devbrain/euler/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B20)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-brightgreen.svg)](https://your-docs-url.com)
