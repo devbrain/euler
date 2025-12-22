@@ -208,16 +208,16 @@ TEST_CASE("euler::vector operations - all dimensions") {
         CHECK(!approx_equal(a, b, constants<float>::epsilon));
         
         // Test approx_zero
-        Vec small = Vec::zero();
-        CHECK(approx_zero(small));
-        
+        Vec small_vec = Vec::zero();
+        CHECK(approx_zero(small_vec));
+
         for (size_t i = 0; i < dim; ++i) {
-            small[i] = constants<float>::epsilon * 0.5f;
+            small_vec[i] = constants<float>::epsilon * 0.5f;
         }
         // For a vector with all components = epsilon * 0.5,
         // length_squared = dim * (epsilon * 0.5)^2 = dim * epsilon^2 / 4
         // So we need tolerance > sqrt(dim) * epsilon / 2
-        CHECK(approx_zero(small, constants<float>::epsilon * std::sqrt(static_cast<float>(dim))));
+        CHECK(approx_zero(small_vec, constants<float>::epsilon * std::sqrt(static_cast<float>(dim))));
     })
     
     // Test smoothstep for all dimensions

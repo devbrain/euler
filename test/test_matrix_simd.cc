@@ -21,7 +21,12 @@ int main() {
         }
     }
     
+    // Use fewer iterations in Debug mode to avoid timeout
+#ifdef NDEBUG
     const int iterations = 1000000;
+#else
+    const int iterations = 10000;
+#endif
     
     // Test expression template multiplication
     auto start = std::chrono::high_resolution_clock::now();

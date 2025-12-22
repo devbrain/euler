@@ -193,27 +193,27 @@ TEST_CASE("Inverse trigonometric functions") {
     
     SUBCASE("atan2 function") {
         SUBCASE("scalar values") {
-            auto angle1 = atan2(0.0f, 1.0f);
+            auto angle1 = euler::atan2(0.0f, 1.0f);
             CHECK(approx_equal(angle1.value(), 0.0f));
-            
-            auto angle2 = atan2(1.0f, 0.0f);
+
+            auto angle2 = euler::atan2(1.0f, 0.0f);
             CHECK(approx_equal(angle2.value(), constants<float>::pi / 2));
-            
-            auto angle3 = atan2(0.0f, -1.0f);
+
+            auto angle3 = euler::atan2(0.0f, -1.0f);
             CHECK(approx_equal(angle3.value(), constants<float>::pi));
-            
-            auto angle4 = atan2(-1.0f, 0.0f);
+
+            auto angle4 = euler::atan2(-1.0f, 0.0f);
             CHECK(approx_equal(angle4.value(), -constants<float>::pi / 2));
-            
+
             // Test degree version
-            auto angle_deg = atan2_deg(1.0f, 1.0f);
+            auto angle_deg = euler::atan2_deg(1.0f, 1.0f);
             CHECK(approx_equal(angle_deg.value(), 45.0f, 0.01f));
         }
-        
+
         SUBCASE("vector values") {
             vec3f y(1.0f, 0.0f, -1.0f);
             vec3f x(0.0f, 1.0f, 0.0f);
-            auto result = atan2(y, x);
+            auto result = euler::atan2(y, x);
             CHECK(approx_equal(result[0].value(), constants<float>::pi / 2));
             CHECK(approx_equal(result[1].value(), 0.0f));
             CHECK(approx_equal(result[2].value(), -constants<float>::pi / 2));

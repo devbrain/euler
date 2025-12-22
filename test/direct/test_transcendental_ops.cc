@@ -398,8 +398,9 @@ TEST_CASE("Edge cases and special values") {
     
     SUBCASE("Very large and small values") {
         vec3<float> large(10.0f, 20.0f, 30.0f);
-        vec3<float> small(1e-30f, 1e-30f, 1e-30f);
+        vec3<float> tiny(1e-30f, 1e-30f, 1e-30f);
         vec3<float> result;
+        (void)tiny;  // unused, just testing initialization
         
         // exp of large values
         exp(large, result);
