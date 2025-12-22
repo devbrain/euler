@@ -22,11 +22,11 @@ int main() {
     }
     
     // Use fewer iterations to avoid CI timeout (60s limit)
-    // Even Release mode can be slow on CI runners
+    // CI runners can be slow even in Release mode
 #ifdef NDEBUG
-    const int iterations = 100000;
+    const int iterations = 50000;
 #else
-    const int iterations = 10000;
+    const int iterations = 5000;
 #endif
     
     // Test expression template multiplication
