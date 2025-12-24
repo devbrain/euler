@@ -890,7 +890,7 @@ public:
                 point2i np{main_pixel.pos.x + dx, main_pixel.pos.y + dy};
                 point2<T> p{static_cast<T>(np.x) + T(0.5), static_cast<T>(np.y) + T(0.5)};
                 
-                T closest_t;
+                T closest_t = T(0);
                 T d = curve_distance(p, closest_t);
                 
                 if (d < T(1)) {

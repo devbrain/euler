@@ -200,7 +200,7 @@ private:
     }
 
     void init_uniform_knots(size_t n) {
-        size_t m = n + degree_ + 1;
+        size_t m = n + static_cast<size_t>(degree_) + 1;
         knots_.resize(m);
 
         // Clamped knot vector
@@ -233,8 +233,8 @@ public:
         : control_points_(std::begin(control_points), std::end(control_points)),
           degree_(degree),
           tolerance_(tolerance),
-          using_line_(false),
-          line_iter_{point2i{0,0}, point2i{0,0}} {
+          line_iter_{point2i{0,0}, point2i{0,0}},
+          using_line_(false) {
 
         if (control_points_.size() < static_cast<size_t>(degree_ + 1)) {
             this->done_ = true;
@@ -270,8 +270,8 @@ public:
           knots_(std::begin(knots), std::end(knots)),
           degree_(degree),
           tolerance_(tolerance),
-          using_line_(false),
-          line_iter_{point2i{0,0}, point2i{0,0}} {
+          line_iter_{point2i{0,0}, point2i{0,0}},
+          using_line_(false) {
 
         if (control_points_.size() < static_cast<size_t>(degree_ + 1) ||
             knots_.size() != control_points_.size() + static_cast<size_t>(degree_ + 1)) {
@@ -484,8 +484,8 @@ public:
           t_(0),
           dt_(T(0.01)),
           tolerance_(tolerance),
-          using_line_(false),
-          line_iter_{point2i{0,0}, point2i{0,0}} {
+          line_iter_{point2i{0,0}, point2i{0,0}},
+          using_line_(false) {
 
         if (points_.size() < 2) {
             this->done_ = true;
