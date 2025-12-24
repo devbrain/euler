@@ -71,16 +71,16 @@ jobs:
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DEULER_BUILD_WITH_TESTS=ON \
-            -DEULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_TESTS=ON \
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
 
       - name: Configure CMake (Windows MSVC)
         if: runner.os == 'Windows' && matrix.compiler == 'msvc'
         run: |
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
-            -DEULER_BUILD_WITH_TESTS=ON `
-            -DEULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_TESTS=ON `
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
 
       - name: Configure CMake (Windows Clang-CL)
         if: runner.os == 'Windows' && matrix.compiler == 'clang-cl'
@@ -88,8 +88,8 @@ jobs:
           cmake -B build `
             -T ClangCL `
             -DCMAKE_BUILD_TYPE=Release `
-            -DEULER_BUILD_WITH_TESTS=ON `
-            -DEULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_TESTS=ON `
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
 
       - name: Build
         run: cmake --build build --config Release
@@ -126,8 +126,8 @@ jobs:
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DEULER_BUILD_WITH_TESTS=ON \
-            -DEULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_TESTS=ON \
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
 
       - name: Build
         run: cmake --build build --config Debug

@@ -1,40 +1,8 @@
-# Test configuration
+# =============================================================================
+# euler tests
+# =============================================================================
+
 include(CTest)
-
-# Set warning flags based on compiler
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    set(EULER_WARNING_FLAGS
-            -Wall           # All standard warnings
-            -Wextra         # Extra warnings
-            -Wpedantic      # Strict ISO C++ compliance
-            -Wcast-align    # Warn about potential performance problem casts
-            -Wcast-qual     # Warn about casts that remove qualifiers
-            -Wconversion    # Warn about type conversions that may lose data
-            -Wdouble-promotion  # Warn about float to double promotion
-            -Wformat=2      # Additional format string warnings
-            -Wnon-virtual-dtor  # Warn about non-virtual destructors
-            -Wold-style-cast    # Warn about C-style casts
-            -Woverloaded-virtual # Warn about overloaded virtual functions
-            -Wshadow        # Warn about variable shadowing
-            -Wsign-conversion   # Warn about sign conversions
-            -Wundef         # Warn about undefined identifiers in #if
-            -Wunused        # Warn about unused entities
-            -Wzero-as-null-pointer-constant # Warn about using 0 as nullptr
-    )
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        list(APPEND EULER_WARNING_FLAGS
-                -Wlogical-op    # Warn about logical operations being used where bitwise were probably wanted
-                -Wuseless-cast  # Warn about useless casts
-        )
-    endif ()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(EULER_WARNING_FLAGS
-            /W4             # Highest warning level
-            /permissive-    # Strict standard conformance
-            /Zc:__cplusplus # Report correct __cplusplus value
-    )
-endif ()
 
 # Collect all test sources
 set(EULER_TEST_SOURCES
@@ -96,10 +64,7 @@ set(EULER_TEST_SOURCES
     dda/test_aa_iterators.cc
     dda/test_batched_iterators.cc
     dda/test_curve_iterator.cc
-    # dda/test_subpixel_accuracy.cc  # Has its own main()
-    # dda/test_subpixel_visual.cc    # Has its own main()
     dda/test_bspline_debug.cc
-    # dda/test_arc_final.cc          # Has its own main()
     dda/dda_io_test.cc
     # Random tests
     random/random_test.cc
@@ -126,28 +91,26 @@ set(EULER_TEST_SOURCES
     integration/comprehensive_ops_test.cc
     # I/O tests
     io/io_test.cc
-    # Other tests
-    # test_matrix_simd.cc  # Has its own main()
 )
 
 # Create test executable
 add_executable(euler_unittest ${EULER_TEST_SOURCES})
 
 # Configure test target
-target_compile_options(euler_unittest PRIVATE ${EULER_WARNING_FLAGS})
+neutrino_target_warnings(euler_unittest)
 target_link_libraries(euler_unittest PRIVATE euler::euler doctest::doctest)
 
 # Add sanitizer flags if enabled
-if(EULER_ENABLE_SANITIZERS)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(NEUTRINO_EULER_ENABLE_SANITIZERS)
+    if(NEUTRINO_COMPILER_IS_GCC OR NEUTRINO_COMPILER_IS_CLANG)
         target_compile_options(euler_unittest PRIVATE -fno-omit-frame-pointer)
         target_link_options(euler_unittest PRIVATE -fno-omit-frame-pointer)
     endif()
 endif()
 
 # Coverage configuration
-if(EULER_ENABLE_COVERAGE)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(NEUTRINO_EULER_ENABLE_COVERAGE)
+    if(NEUTRINO_COMPILER_IS_GCC OR NEUTRINO_COMPILER_IS_CLANG)
         target_compile_options(euler_unittest PRIVATE --coverage)
         target_link_options(euler_unittest PRIVATE --coverage)
     endif()
@@ -203,11 +166,11 @@ if(VALGRIND_EXECUTABLE AND NOT WIN32)
 endif()
 
 # Coverage target
-if(EULER_ENABLE_COVERAGE)
+if(NEUTRINO_EULER_ENABLE_COVERAGE)
     find_program(GCOV_EXECUTABLE gcov)
     find_program(LCOV_EXECUTABLE lcov)
     find_program(GENHTML_EXECUTABLE genhtml)
-    
+
     if(LCOV_EXECUTABLE AND GENHTML_EXECUTABLE)
         add_custom_target(coverage
             COMMAND ${LCOV_EXECUTABLE} --directory . --zerocounters
@@ -238,9 +201,9 @@ set(STANDALONE_TESTS
 foreach(test ${STANDALONE_TESTS})
     get_filename_component(test_name ${test} NAME_WE)
     add_executable(${test_name} ${test}.cc)
-    target_compile_options(${test_name} PRIVATE ${EULER_WARNING_FLAGS})
+    neutrino_target_warnings(${test_name})
     target_link_libraries(${test_name} PRIVATE euler::euler)
-    
+
     # Add as a separate test
     add_test(NAME ${test_name} COMMAND ${test_name})
     set_tests_properties(${test_name} PROPERTIES
