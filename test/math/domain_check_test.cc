@@ -17,6 +17,7 @@ bool throws_exception(Func&& f) {
     }
 }
 
+#ifdef EULER_DEBUG
 TEST_CASE("Domain checks for mathematical functions") {
     SUBCASE("Square root domain checks") {
         // Scalar negative should throw
@@ -114,6 +115,7 @@ TEST_CASE("Domain checks for mathematical functions") {
         CHECK_NOTHROW(euler::atanh(-0.5f));
     }
 }
+#endif
 
 #ifdef EULER_DEBUG
 TEST_CASE("Domain check error messages") {

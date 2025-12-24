@@ -140,9 +140,12 @@ TEST_CASE("Complex quaternion operations") {
 TEST_CASE("Edge cases and error handling") {
     SUBCASE("Zero quaternion normalization throws") {
         quatf zero(0.0f, 0.0f, 0.0f, 0.0f);
+#ifdef EULER_DEBUG
+        // Error checking only throws in Debug builds
         CHECK_THROWS(zero.normalize());
         CHECK_THROWS(inverse(zero));
         CHECK_THROWS(log(zero));
+#endif
     }
     
     SUBCASE("Near-identity slerp uses lerp") {
@@ -161,11 +164,14 @@ TEST_CASE("Edge cases and error handling") {
     SUBCASE("Interpolation parameter validation") {
         quatf q1 = quatf::identity();
         quatf q2 = quatf::from_axis_angle(vec3f::unit_x(), 45.0_deg);
-        
+
+#ifdef EULER_DEBUG
+        // Range validation only throws in Debug builds
         CHECK_THROWS(lerp(q1, q2, -0.1f));
         CHECK_THROWS(lerp(q1, q2, 1.1f));
         CHECK_THROWS(slerp(q1, q2, -0.1f));
         CHECK_THROWS(slerp(q1, q2, 1.1f));
+#endif
     }
 }
 

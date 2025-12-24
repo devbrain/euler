@@ -155,7 +155,8 @@ TEST_CASE("Trigonometric expression templates") {
     SUBCASE("Expression templates avoid intermediate allocations") {
         // This test verifies that expression templates work correctly
         // by checking that complex expressions produce correct results
-        vec4f angles(0.0f, constants<float>::pi / 4, constants<float>::pi / 2, constants<float>::pi);
+        // Note: avoid angles that result in tan(pi/2) which is undefined
+        vec4f angles(0.0f, constants<float>::pi / 4, constants<float>::pi / 3, constants<float>::pi / 6);
         
         // Store intermediate results to avoid dangling references
         vec4f sin_angles = sin(angles);

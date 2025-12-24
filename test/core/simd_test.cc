@@ -278,10 +278,12 @@ TEST_CASE("euler::aligned_alloc") {
         aligned_free(i_data);
     }
     
+#ifdef EULER_DEBUG
     SUBCASE("zero count allocation should fail") {
         CHECK_THROWS_AS(
             aligned_alloc<float>(0),
             std::runtime_error
         );
     }
+#endif
 }

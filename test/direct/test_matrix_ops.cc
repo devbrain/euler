@@ -538,13 +538,15 @@ TEST_CASE("Matrix inverse operations") {
         CHECK(approx_equal(identity_check, identity, FLOAT_TOL));
     }
     
+#ifdef EULER_DEBUG
     SUBCASE("Singular matrix throws") {
         matrix2<float> singular = {{1.0f, 2.0f},
                                   {2.0f, 4.0f}};  // Rows are linearly dependent
         matrix2<float> result;
-        
+
         CHECK_THROWS_AS(inverse(singular, result), std::runtime_error);
     }
+#endif
 }
 
 TEST_CASE("Adjugate and cofactor matrices") {
