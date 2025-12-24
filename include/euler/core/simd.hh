@@ -285,14 +285,18 @@ constexpr bool should_use_simd(size_t size) {
 template<typename T>
 T* aligned_alloc(size_t count) {
     EULER_CHECK_POSITIVE(count, "allocation count");
-    
+
     const size_t alignment = simd_alignment<T>();
-    const size_t bytes = count * sizeof(T);
-    
+
     // posix_memalign requires alignment to be at least sizeof(void*) and a power of 2
     const size_t min_align = sizeof(void*);
     const size_t actual_align = alignment < min_align ? min_align : alignment;
-    
+
+    // Round up size to be a multiple of alignment
+    // This is required by C11 aligned_alloc and prevents heap corruption on Windows
+    size_t bytes = count * sizeof(T);
+    bytes = (bytes + actual_align - 1) & ~(actual_align - 1);
+
     #ifdef _MSC_VER
     T* result = static_cast<T*>(_aligned_malloc(bytes, actual_align));
     #else
@@ -302,7 +306,7 @@ T* aligned_alloc(size_t count) {
     }
     T* result = static_cast<T*>(ptr);
     #endif
-    
+
     EULER_CRITICAL_CHECK(result != nullptr, error_code::null_pointer,
                         "Failed to allocate aligned memory");
     return result;
