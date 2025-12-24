@@ -80,7 +80,8 @@ jobs:
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
             -DNEUTRINO_EULER_BUILD_TESTS=ON `
-            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF `
+            -DNEUTRINO_EULER_ENABLE_XSIMD=OFF
 
       - name: Configure CMake (Windows Clang-CL)
         if: runner.os == 'Windows' && matrix.compiler == 'clang-cl'
