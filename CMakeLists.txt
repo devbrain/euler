@@ -61,7 +61,39 @@ endif()
 # Dependencies
 # =============================================================================
 
-add_subdirectory(ext)
+# Failsafe - Error handling library (required)
+include(deps/failsafe)
+neutrino_fetch_failsafe()
+
+# xsimd - SIMD library (optional)
+if(NEUTRINO_EULER_ENABLE_XSIMD)
+    include(deps/xsimd)
+    neutrino_fetch_xsimd()
+endif()
+
+# Doctest - Unit testing framework (for tests)
+if(NEUTRINO_EULER_BUILD_TESTS)
+    include(deps/doctest)
+    neutrino_fetch_doctest()
+endif()
+
+# Google Benchmark (for benchmarks)
+if(NEUTRINO_EULER_BUILD_BENCHMARKS)
+    include(deps/benchmark)
+    neutrino_fetch_benchmark()
+endif()
+
+# SDL2 and ImGui for examples
+if(NEUTRINO_EULER_BUILD_EXAMPLES)
+    find_package(SDL2 QUIET)
+    if(SDL2_FOUND)
+        message(STATUS "[euler] Found SDL2, graphics examples will be built")
+        include(deps/imgui)
+        neutrino_fetch_imgui()
+    else()
+        message(STATUS "[euler] SDL2 not found, some graphics examples will be skipped")
+    endif()
+endif()
 
 # =============================================================================
 # Main library target (header-only)
