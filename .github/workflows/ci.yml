@@ -89,7 +89,8 @@ jobs:
             -T ClangCL `
             -DCMAKE_BUILD_TYPE=Release `
             -DNEUTRINO_EULER_BUILD_TESTS=ON `
-            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF
+            -DNEUTRINO_EULER_BUILD_EXAMPLES=OFF `
+            -DNEUTRINO_EULER_ENABLE_XSIMD=OFF
 
       - name: Build
         run: cmake --build build --config Release
