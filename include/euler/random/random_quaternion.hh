@@ -4,14 +4,11 @@
 #include <euler/quaternion/quaternion.hh>
 #include <euler/random/random.hh>
 #include <euler/random/random_angle.hh>
+#include <euler/random/random_vec.hh>
 #include <euler/math/basic.hh>
 #include <euler/math/trigonometry.hh>
 
 namespace euler {
-
-// Forward declarations to avoid circular dependency
-template<typename T, size_t N, typename Generator>
-vector<T, N> random_unit_vector(Generator& g);
 
 // ============================================================================
 // Random Quaternion Generation
