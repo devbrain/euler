@@ -7,30 +7,48 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <filesystem>
 
-int main() {
+int main(int argc, char* argv[]) {
     std::cout << "Euler Comprehensive Benchmark Suite" << std::endl;
     std::cout << "===================================" << std::endl;
     std::cout << std::endl;
-    
+
+    // Get the directory containing this executable
+    std::filesystem::path exe_path;
+    if (argc > 0 && argv[0] != nullptr) {
+        exe_path = std::filesystem::path(argv[0]).parent_path();
+        if (exe_path.empty()) {
+            exe_path = ".";
+        }
+    } else {
+        exe_path = ".";
+    }
+
     struct BenchmarkInfo {
         std::string name;
         std::string description;
         std::string executable;
     };
-    
+
+#ifdef _WIN32
+    const std::string exe_suffix = ".exe";
+#else
+    const std::string exe_suffix = "";
+#endif
+
     std::vector<BenchmarkInfo> benchmarks = {
-        {"Matrix/Vector Operations", 
+        {"Matrix/Vector Operations",
          "Tests basic linear algebra operations with and without SIMD",
-         "./benchmark/benchmark_matrix_vector"},
-        
-        {"DDA Operations", 
+         (exe_path / ("benchmark_matrix_vector" + exe_suffix)).string()},
+
+        {"DDA Operations",
          "Tests line and curve rasterization with regular and batched iterators",
-         "./benchmark/benchmark_dda"},
-        
-        {"SIMD Operations", 
+         (exe_path / ("benchmark_dda" + exe_suffix)).string()},
+
+        {"SIMD Operations",
          "Direct comparison of scalar vs SIMD implementations",
-         "./benchmark/benchmark_simd"}
+         (exe_path / ("benchmark_simd" + exe_suffix)).string()}
     };
     
     bool all_passed = true;
