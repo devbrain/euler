@@ -619,7 +619,7 @@ template<typename Vec1, typename Vec2,
          typename = std::enable_if_t<is_any_vector_v<Vec1> && is_any_vector_v<Vec2>>>
 auto project(const Vec1& a, const Vec2& b) {
     using T = typename Vec1::value_type;
-    T b_len_sq = length_squared(b);
+    [[maybe_unused]] T b_len_sq = length_squared(b);
     EULER_CHECK(b_len_sq > T(0), error_code::invalid_argument,
                "Cannot project onto zero-length vector");
     return project_expr<Vec1, Vec2>(a, b);
@@ -633,7 +633,7 @@ auto project(const Expr1& a, const Expr2& b) -> std::enable_if_t<
     project_expr<Expr1, Expr2>
 > {
     using T = typename Expr1::value_type;
-    T b_len_sq = length_squared(b);
+    [[maybe_unused]] T b_len_sq = length_squared(b);
     EULER_CHECK(b_len_sq > T(0), error_code::invalid_argument,
                "Cannot project onto zero-length vector");
     return project_expr<Expr1, Expr2>(a, b);
@@ -646,7 +646,7 @@ auto project(const Expr& a, const Vec& b) -> std::enable_if_t<
     project_expr<Expr, Vec>
 > {
     using T = typename Expr::value_type;
-    T b_len_sq = length_squared(b);
+    [[maybe_unused]] T b_len_sq = length_squared(b);
     EULER_CHECK(b_len_sq > T(0), error_code::invalid_argument,
                "Cannot project onto zero-length vector");
     return project_expr<Expr, Vec>(a, b);
@@ -659,7 +659,7 @@ auto project(const Vec& a, const Expr& b) -> std::enable_if_t<
     project_expr<Vec, Expr>
 > {
     using T = typename Vec::value_type;
-    T b_len_sq = length_squared(b);
+    [[maybe_unused]] T b_len_sq = length_squared(b);
     EULER_CHECK(b_len_sq > T(0), error_code::invalid_argument,
                "Cannot project onto zero-length vector");
     return project_expr<Vec, Expr>(a, b);
