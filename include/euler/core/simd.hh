@@ -7,6 +7,9 @@
 #include <cstring>
 #include <cmath>
 #include <cstdlib>
+#ifdef _MSC_VER
+#include <malloc.h>  // For _aligned_malloc and _aligned_free on Windows
+#endif
 
 // Check if xsimd is available
 #ifdef EULER_HAS_XSIMD
