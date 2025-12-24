@@ -187,8 +187,9 @@ endif()
 # Installation
 # =============================================================================
 
-# Only install if failsafe is already installed (not fetched)
-# This avoids export set issues when failsafe is a FetchContent dependency
+# Check if failsafe was fetched via FetchContent (vs system-installed)
+# We can't install euler if failsafe is a FetchContent dependency due to export set issues
+FetchContent_GetProperties(failsafe)
 if(NEUTRINO_EULER_INSTALL AND NOT failsafe_POPULATED)
     include(NeutrinoInstall)
 
