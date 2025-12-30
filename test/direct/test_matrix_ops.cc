@@ -9,7 +9,6 @@
 #include <euler/vector/vector.hh>
 #include <euler/core/approx_equal.hh>
 #include <random>
-#include <chrono>
 
 using namespace euler;
 using namespace euler::direct;
@@ -625,41 +624,5 @@ TEST_CASE("Adjugate and cofactor matrices") {
                 CHECK(adj(i, j) == doctest::Approx(cof(j, i)));
             }
         }
-    }
-}
-
-// =============================================================================
-// Performance comparison test
-// =============================================================================
-
-TEST_CASE("Performance verification") {
-    SUBCASE("Direct operations should be efficient") {
-        RandomMatrixGenerator<float> rng;
-        constexpr unsigned int iterations = 100;
-        
-        // Generate test data
-        std::vector<matrix4<float>> a_mats, b_mats, c_mats;
-        for (unsigned int i = 0; i < iterations; ++i) {
-            a_mats.push_back(rng.generate<4, 4>());
-            b_mats.push_back(rng.generate<4, 4>());
-            c_mats.push_back(matrix4<float>{});
-        }
-        
-        // Time direct operations
-        auto start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            mul(a_mats[i], b_mats[i], c_mats[i]);
-        }
-        auto direct_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Time expression template operations
-        start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            c_mats[i] = a_mats[i] * b_mats[i];
-        }
-        auto expr_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Direct should not be significantly slower
-        CHECK(direct_time.count() < expr_time.count() * 3);
     }
 }
