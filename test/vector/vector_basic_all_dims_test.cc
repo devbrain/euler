@@ -9,7 +9,7 @@ TEST_CASE("euler::vector basic operations - all dimensions") {
     
     SUBCASE("2D vector basics") {
         // Construction
-        vec2<float> v1;
+        [[maybe_unused]] vec2<float> v1;  // Default construction
         vec2<float> v2(5.0f);
         vec2<float> v3(1.0f, 2.0f);
         
@@ -66,7 +66,7 @@ TEST_CASE("euler::vector basic operations - all dimensions") {
     
     SUBCASE("3D vector basics") {
         // Construction
-        vec3<float> v1;
+        [[maybe_unused]] vec3<float> v1;  // Default construction
         vec3<float> v2(5.0f);
         vec3<float> v3(1.0f, 2.0f, 3.0f);
         
@@ -143,7 +143,7 @@ TEST_CASE("euler::vector basic operations - all dimensions") {
     
     SUBCASE("4D vector basics") {
         // Construction
-        vec4<float> v1;
+        [[maybe_unused]] vec4<float> v1;  // Default construction
         vec4<float> v2(5.0f);
         vec4<float> v3(1.0f, 2.0f, 3.0f, 4.0f);
         
@@ -308,21 +308,41 @@ TEST_CASE("euler::vector conversions - all dimensions") {
     }
     
     SUBCASE("Type conversions") {
-        // Float to double conversions
+        // Float vectors
         vec2f v2f(1.0f, 2.0f);
-        vec2d v2d(1.0, 2.0);
-        
         vec3f v3f(1.0f, 2.0f, 3.0f);
-        vec3d v3d(1.0, 2.0, 3.0);
-        
         vec4f v4f(1.0f, 2.0f, 3.0f, 4.0f);
+
+        CHECK(v2f[0] == 1.0f);
+        CHECK(v2f[1] == 2.0f);
+        CHECK(v3f[0] == 1.0f);
+        CHECK(v3f[1] == 2.0f);
+        CHECK(v3f[2] == 3.0f);
+        CHECK(v4f[0] == 1.0f);
+        CHECK(v4f[1] == 2.0f);
+        CHECK(v4f[2] == 3.0f);
+        CHECK(v4f[3] == 4.0f);
+
+        // Double vectors
+        vec2d v2d(1.0, 2.0);
+        vec3d v3d(1.0, 2.0, 3.0);
         vec4d v4d(1.0, 2.0, 3.0, 4.0);
-        
+
+        CHECK(v2d[0] == 1.0);
+        CHECK(v2d[1] == 2.0);
+        CHECK(v3d[0] == 1.0);
+        CHECK(v3d[1] == 2.0);
+        CHECK(v3d[2] == 3.0);
+        CHECK(v4d[0] == 1.0);
+        CHECK(v4d[1] == 2.0);
+        CHECK(v4d[2] == 3.0);
+        CHECK(v4d[3] == 4.0);
+
         // Integer vectors
         vec2i v2i(1, 2);
         vec3i v3i(1, 2, 3);
         vec4i v4i(1, 2, 3, 4);
-        
+
         CHECK(v2i[0] == 1);
         CHECK(v2i[1] == 2);
         CHECK(v3i[0] == 1);
