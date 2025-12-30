@@ -5,12 +5,7 @@
 
 TEST_CASE("euler::vector construction") {
     using namespace euler;
-    
-    SUBCASE("default constructor") {
-        vector3 v;
-        // Default initialized values may be unspecified
-    }
-    
+
     SUBCASE("scalar constructor") {
         vector3 v(5.0f);
         CHECK(v[0] == 5.0f);
