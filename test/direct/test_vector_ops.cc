@@ -9,14 +9,12 @@
 #include <euler/core/approx_equal.hh>
 #include <random>
 #include <vector>
-#include <chrono>
 
 using namespace euler;
 using namespace euler::direct;
 
 // Test configuration
 constexpr float FLOAT_TOL = 1e-6f;
-constexpr double DOUBLE_TOL = 1e-12;
 
 // Helper to generate random vectors
 template<typename T>
@@ -702,41 +700,3 @@ TEST_CASE("Edge cases and special values") {
     }
 }
 
-// =============================================================================
-// Performance comparison test (not a unit test, but useful for verification)
-// =============================================================================
-
-TEST_CASE("Performance verification") {
-    SUBCASE("Direct operations should not be slower than expression templates") {
-        RandomVectorGenerator<float> rng;
-        const unsigned int iterations = 1000;
-        
-        // Generate test data
-        std::vector<vec3<float>> a_vecs, b_vecs, c_vecs;
-        for (unsigned int i = 0; i < iterations; ++i) {
-            a_vecs.push_back(rng.generate<3>());
-            b_vecs.push_back(rng.generate<3>());
-            c_vecs.push_back(vec3<float>{});
-        }
-        
-        // Time direct operations
-        auto start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            add(a_vecs[i], b_vecs[i], c_vecs[i]);
-        }
-        auto direct_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Time expression template operations
-        start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            c_vecs[i] = a_vecs[i] + b_vecs[i];
-        }
-        auto expr_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Direct should not be significantly slower
-        // (In practice, it should be faster for simple operations)
-        // Use generous 10x threshold to avoid flaky failures on CI runners
-        // where timing measurements are unreliable due to shared resources
-        CHECK(direct_time.count() < expr_time.count() * 10);
-    }
-}

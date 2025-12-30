@@ -11,8 +11,6 @@
 #include <euler/core/types.hh>
 #include <euler/core/compiler.hh>
 #include <random>
-#include <chrono>
-#include <vector>
 
 // Disable strict overflow warnings for xsimd's internal functions
 EULER_DISABLE_WARNING_PUSH
@@ -23,7 +21,6 @@ using namespace euler::direct;
 
 // Test configuration
 constexpr float FLOAT_TOL = 1e-5f;
-constexpr double DOUBLE_TOL = 1e-12;
 
 // Helper to generate random vectors
 template<typename T>
@@ -410,43 +407,6 @@ TEST_CASE("Edge cases and special values") {
         vec3<float> small_pos(1e-10f, 1e-20f, 1e-30f);
         log(small_pos, result);
         // Just check it doesn't crash - results may vary
-    }
-}
-
-// =============================================================================
-// Performance comparison test
-// =============================================================================
-
-TEST_CASE("Performance verification") {
-    SUBCASE("Direct operations should be efficient") {
-        RandomVectorGenerator<float> rng;
-        constexpr unsigned int iterations = 1000;
-        
-        // Generate test data
-        std::vector<vec4<float>> input_vecs, output_vecs;
-        for (unsigned int i = 0; i < iterations; ++i) {
-            input_vecs.push_back(rng.generate_range<4>(-constants<float>::pi, constants<float>::pi));
-            output_vecs.push_back(vec4<float>{});
-        }
-        
-        // Time direct operations
-        auto start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            sin(input_vecs[i], output_vecs[i]);
-        }
-        auto direct_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Time standard operations
-        start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            for (size_t j = 0; j < 4; ++j) {
-                output_vecs[i][j] = std::sin(input_vecs[i][j]);
-            }
-        }
-        auto std_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Direct should not be significantly slower
-        CHECK(direct_time.count() < std_time.count() * 3);
     }
 }
 

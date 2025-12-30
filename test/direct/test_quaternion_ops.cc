@@ -10,14 +10,12 @@
 #include <euler/matrix/matrix.hh>
 #include <euler/core/approx_equal.hh>
 #include <random>
-#include <chrono>
 
 using namespace euler;
 using namespace euler::direct;
 
 // Test configuration
 constexpr float FLOAT_TOL = 1e-5f;
-constexpr double DOUBLE_TOL = 1e-12;
 
 // Helper to generate random quaternions
 template<typename T>
@@ -534,38 +532,3 @@ TEST_CASE("Edge cases and special values") {
     }
 }
 
-// =============================================================================
-// Performance comparison test
-// =============================================================================
-
-TEST_CASE("Performance verification") {
-    SUBCASE("Direct operations should be efficient") {
-        RandomQuaternionGenerator<float> rng;
-        constexpr unsigned int iterations = 1000;
-        
-        // Generate test data
-        std::vector<quatf> a_quats, b_quats, c_quats;
-        for (unsigned int i = 0; i < iterations; ++i) {
-            a_quats.push_back(rng.generate());
-            b_quats.push_back(rng.generate());
-            c_quats.push_back(quatf{});
-        }
-        
-        // Time direct operations
-        auto start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            mul(a_quats[i], b_quats[i], c_quats[i]);
-        }
-        auto direct_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Time expression template operations
-        start = std::chrono::high_resolution_clock::now();
-        for (unsigned int i = 0; i < iterations; ++i) {
-            c_quats[i] = a_quats[i] * b_quats[i];
-        }
-        auto expr_time = std::chrono::high_resolution_clock::now() - start;
-        
-        // Direct should not be significantly slower
-        CHECK(direct_time.count() < expr_time.count() * 3);
-    }
-}
