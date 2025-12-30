@@ -15,7 +15,6 @@ using namespace euler::direct;
 
 // Test configuration
 constexpr float FLOAT_TOL = 1e-5f;
-constexpr double DOUBLE_TOL = 1e-12;
 
 // Helper to generate random matrices
 template<typename T>
