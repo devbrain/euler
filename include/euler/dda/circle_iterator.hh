@@ -47,6 +47,7 @@
 #include <euler/angles/angle.hh>
 #include <euler/angles/angle_ops.hh>
 #include <euler/math/trigonometry.hh>
+#include <euler/core/types.hh>
 #include <array>
 
 namespace euler::dda {
@@ -127,7 +128,7 @@ private:
     
     bool is_angle_in_arc(int dx, int dy) const {
         T angle = static_cast<T>(atan2(static_cast<double>(dy), static_cast<double>(dx)));
-        if (angle < 0) angle += T(2 * pi);
+        if (angle < 0) angle += constants<T>::two_pi;
         
         if (start_angle_ <= end_angle_) {
             return angle >= start_angle_ && angle <= end_angle_;
@@ -241,17 +242,6 @@ public:
         
         return *this;
     }
-    
-    /**
-     * @brief Post-increment
-     */
-    circle_iterator operator++(int) {
-        circle_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**
@@ -318,17 +308,6 @@ public:
         }
         return *this;
     }
-    
-    /**
-     * @brief Post-increment
-     */
-    filled_circle_iterator operator++(int) {
-        filled_circle_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**

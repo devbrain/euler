@@ -68,9 +68,6 @@ TEST_CASE("Scalar-matrix operations") {
         matrix<float, 2, 2> expected{{9.5f, 9.0f}, {8.5f, 8.0f}};
 
         matrix<float, 2, 2> actual(result);
-        MESSAGE("Actual result: " << actual(0,0) << " " << actual(0,1) << " " << actual(1,0) << " " << actual(1,1));
-        MESSAGE("Expected: " << expected(0,0) << " " << expected(0,1) << " " << expected(1,0) << " " << expected(1,1));
-
         CHECK(approx_equal(actual, expected));
     }
     

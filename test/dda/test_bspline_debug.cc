@@ -21,11 +21,6 @@ TEST_CASE("Debug B-spline end point issue") {
             {90.0f, 10.0f}    // P4
         };
         
-        MESSAGE("Control points:");
-        for (size_t i = 0; i < control_points.size(); ++i) {
-            MESSAGE("P" << i << ": (" << control_points[i].x << ", " << control_points[i].y << ")");
-        }
-        
         // Create B-spline iterator
         auto bspline = make_bspline(control_points, 3); // degree 3 (cubic)
         
@@ -36,11 +31,6 @@ TEST_CASE("Debug B-spline end point issue") {
         for (; bspline != decltype(bspline)::end(); ++bspline) {
             auto pixel = *bspline;
             pixels.push_back(pixel.pos);
-            
-            if (count < 10 || count % 10 == 0) {
-                MESSAGE("Pixel " << count << ": (" << pixel.pos.x << ", " << pixel.pos.y << ")");
-            }
-            
             last_pixel = pixel.pos;
             count++;
             
@@ -51,21 +41,15 @@ TEST_CASE("Debug B-spline end point issue") {
             }
         }
         
-        MESSAGE("Total pixels: " << pixels.size());
-        MESSAGE("Last pixel: (" << last_pixel.x << ", " << last_pixel.y << ")");
-        
         // Check that the curve ends near the last control point
         // For a cubic B-spline, the curve should end at or near P4
         auto expected_end = control_points.back();
-        MESSAGE("Expected end near: (" << expected_end.x << ", " << expected_end.y << ")");
-        
+
         // Check if last pixel is reasonably close to the last control point
         float dx = std::abs(float(last_pixel.x) - expected_end.x);
         float dy = std::abs(float(last_pixel.y) - expected_end.y);
         float distance = std::sqrt(dx * dx + dy * dy);
-        
-        MESSAGE("Distance from last pixel to last control point: " << distance);
-        
+
         CHECK(distance < 5.0f); // Should be within 5 pixels
         
         // Also check for the "jump to origin" issue

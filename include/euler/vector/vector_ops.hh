@@ -104,6 +104,11 @@ auto normalize(const expression<Expr, typename Expr::value_type>& expr) {
 // Fast normalize for vec3 using SIMD when possible
 template<typename T>
 vector<T, 3> fast_normalize(const vector<T, 3>& v) {
+    // Early check for zero-length vector (avoids NaN/Inf in SIMD paths)
+    T len_sq_check = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    if (len_sq_check <= std::numeric_limits<T>::epsilon()) {
+        return vector<T, 3>(T(0), T(0), T(0));
+    }
 #ifdef EULER_HAS_SIMD
     if constexpr (std::is_same_v<T, float>) {
         // Use SSE intrinsics for float
@@ -164,6 +169,10 @@ vector<T, 3> fast_normalize(const vector<T, 3>& v) {
     {
         // Fallback to standard normalization
         T len_sq = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+        // Handle zero-length vectors to avoid division by zero
+        if (len_sq <= std::numeric_limits<T>::epsilon()) {
+            return vector<T, 3>(T(0), T(0), T(0));
+        }
         T inv_len = T(1) / std::sqrt(len_sq);
         return vector<T, 3>(v[0] * inv_len, v[1] * inv_len, v[2] * inv_len);
     }

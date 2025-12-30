@@ -96,8 +96,8 @@ public:
     
 private:
     T mean_, stddev_;
-    mutable bool has_saved_;
-    mutable T saved_;
+    bool has_saved_;
+    T saved_;
 };
 
 // ============================================================================

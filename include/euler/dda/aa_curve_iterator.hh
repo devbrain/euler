@@ -234,16 +234,7 @@ public:
     // Override is_done to check pixel consumption
     constexpr bool is_done() const {
         return this->done_ && pixel_index_ >= pixel_count_;
-    }
-    
-    aa_curve_iterator operator++(int) {
-        aa_curve_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Helper to create antialiased parametric curve iterator

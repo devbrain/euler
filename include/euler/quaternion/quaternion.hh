@@ -277,16 +277,18 @@ public:
             return identity();
         }
         
-        // Handle anti-parallel vectors
-        if (d <= -T(1) + constants<T>::epsilon) {
+        // Handle anti-parallel vectors (use wider margin to avoid numerical instability)
+        // When d is close to -1, sqrt((1+d)*2) becomes very small, causing large invs
+        constexpr T antiparallel_threshold = T(1e-4);
+        if (d <= -T(1) + antiparallel_threshold) {
             // Find an orthogonal vector
-            vector<T, 3> axis = std::abs(from[0]) > T(0.9) 
+            vector<T, 3> axis = std::abs(from[0]) > T(0.9)
                 ? cross(from, vector<T, 3>(0, 1, 0))
                 : cross(from, vector<T, 3>(1, 0, 0));
             axis = euler::normalize(axis);
             return from_axis_angle(axis, radian<T>(constants<T>::pi));
         }
-        
+
         // General case
         vector<T, 3> axis = cross(from, to);
         T s = sqrt((T(1) + d) * T(2));
@@ -321,15 +323,21 @@ public:
     constexpr const T& y() const noexcept { return y_; }
     constexpr const T& z() const noexcept { return z_; }
     
-    // Array-like access
-    T& operator[](size_t idx) {
+    // Array-like access (order: w, x, y, z)
+    constexpr T& operator[](size_t idx) {
         EULER_CHECK_INDEX(idx, 4);
-        return (&w_)[idx];
+        if (idx == 0) return w_;
+        if (idx == 1) return x_;
+        if (idx == 2) return y_;
+        return z_;
     }
-    
+
     constexpr const T& operator[](size_t idx) const {
         EULER_CHECK_INDEX(idx, 4);
-        return (&w_)[idx];
+        if (idx == 0) return w_;
+        if (idx == 1) return x_;
+        if (idx == 2) return y_;
+        return z_;
     }
     
     // Vector part (imaginary components)
@@ -350,21 +358,21 @@ public:
     }
     
     // Norm (length)
-    T norm() const {
+    T norm() const noexcept {
         return sqrt(norm_squared());
     }
-    
+
     // Alias for norm
-    T length() const {
+    T length() const noexcept {
         return norm();
     }
-    
+
     // Check if normalized (unit quaternion)
-    bool is_normalized() const {
+    bool is_normalized() const noexcept {
         return is_normalized(T(1e-6));
     }
-    
-    bool is_normalized(T tolerance) const {
+
+    bool is_normalized(T tolerance) const noexcept {
         return approx_equal(norm_squared(), T(1), tolerance);
     }
     
@@ -524,14 +532,12 @@ public:
     vector<radian<T>, 3> to_euler(euler_order order = euler_order::XYZ) const {
         matrix<T, 3, 3> m = to_matrix3();
         radian<T> x, y, z;
-        
+        constexpr T gimbal_threshold = T(1e-6);
+
         switch (order) {
             case euler_order::XYZ: {
-                // Check for gimbal lock
                 T sy = sqrt(m(0,0)*m(0,0) + m(1,0)*m(1,0));
-                bool singular = sy < T(1e-6);
-                
-                if (!singular) {
+                if (sy > gimbal_threshold) {
                     x = atan2(m(2,1), m(2,2));
                     y = atan2(-m(2,0), sy);
                     z = atan2(m(1,0), m(0,0));
@@ -542,13 +548,78 @@ public:
                 }
                 break;
             }
-                
-            // Add other orders as needed...
-            default:
-                x = y = z = radian<T>(0);
+
+            case euler_order::XZY: {
+                T sz = sqrt(m(0,0)*m(0,0) + m(2,0)*m(2,0));
+                if (sz > gimbal_threshold) {
+                    x = atan2(-m(1,2), m(1,1));
+                    z = atan2(-m(2,0), m(0,0));
+                    y = atan2(m(1,0), sz);
+                } else {
+                    x = atan2(m(2,1), m(2,2));
+                    z = radian<T>(0);
+                    y = atan2(m(1,0), sz);
+                }
                 break;
+            }
+
+            case euler_order::YXZ: {
+                T sx = sqrt(m(1,1)*m(1,1) + m(2,1)*m(2,1));
+                if (sx > gimbal_threshold) {
+                    y = atan2(m(0,2), m(0,0));
+                    x = atan2(m(2,1), sx);
+                    z = atan2(-m(0,1), sqrt(m(0,0)*m(0,0) + m(0,2)*m(0,2)));
+                } else {
+                    y = atan2(-m(2,0), m(2,2));
+                    x = atan2(m(2,1), sx);
+                    z = radian<T>(0);
+                }
+                break;
+            }
+
+            case euler_order::YZX: {
+                T sz = sqrt(m(0,0)*m(0,0) + m(0,2)*m(0,2));
+                if (sz > gimbal_threshold) {
+                    y = atan2(-m(2,0), m(0,0));
+                    z = atan2(m(0,1), sz);
+                    x = atan2(-m(2,1), m(1,1));
+                } else {
+                    y = atan2(m(0,2), m(2,2));
+                    z = atan2(m(0,1), sz);
+                    x = radian<T>(0);
+                }
+                break;
+            }
+
+            case euler_order::ZXY: {
+                T sx = sqrt(m(0,0)*m(0,0) + m(0,1)*m(0,1));
+                if (sx > gimbal_threshold) {
+                    z = atan2(-m(0,1), m(0,0));
+                    x = atan2(m(1,2), sx);
+                    y = atan2(-m(0,2), sqrt(m(0,0)*m(0,0) + m(0,1)*m(0,1)));
+                } else {
+                    z = atan2(m(1,0), m(1,1));
+                    x = atan2(m(1,2), sx);
+                    y = radian<T>(0);
+                }
+                break;
+            }
+
+            case euler_order::ZYX: {
+                T sy = sqrt(m(0,0)*m(0,0) + m(0,1)*m(0,1));
+                if (sy > gimbal_threshold) {
+                    z = atan2(m(1,0), m(0,0));
+                    y = atan2(-m(2,0), sy);
+                    x = atan2(m(2,1), m(2,2));
+                } else {
+                    z = atan2(-m(0,1), m(1,1));
+                    y = atan2(-m(2,0), sy);
+                    x = radian<T>(0);
+                }
+                break;
+            }
         }
-        
+
         return vector<radian<T>, 3>(x, y, z);
     }
     

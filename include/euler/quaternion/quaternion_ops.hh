@@ -20,14 +20,10 @@ inline quaternion<T> conjugate(const quaternion<T>& q) {
 // Inverse: q^(-1) = q* / |q|²
 template<typename T>
 inline quaternion<T> inverse(const quaternion<T>& q) {
-    #ifdef EULER_DEBUG
     T norm_sq = q.norm_squared();
     EULER_CHECK(norm_sq > constants<T>::epsilon, error_code::invalid_argument,
                 "quaternion::inverse: cannot invert zero quaternion");
-    #else
-    T norm_sq = q.norm_squared();
-    #endif
-    
+
     T inv_norm = T(1) / norm_sq;
     return quaternion<T>(
         q.w() * inv_norm,
@@ -226,10 +222,17 @@ inline quaternion<T> slerp(const quaternion<T>& q1, const quaternion<T>& q2, T t
     
     // Clamp to handle numerical errors
     cos_theta = clamp(cos_theta, T(-1), T(1));
-    
+
     // Calculate coefficients
     T theta = acos(cos_theta);
     T sin_theta = sin(theta);
+
+    // Safety check: if sin_theta is too small, fall back to lerp
+    // (this shouldn't happen given the 0.995 threshold, but guards against edge cases)
+    if (sin_theta < constants<T>::epsilon) {
+        return lerp(q1, q2_adjusted, t);
+    }
+
     T s1 = sin((T(1) - t) * theta) / sin_theta;
     T s2 = sin(t * theta) / sin_theta;
     

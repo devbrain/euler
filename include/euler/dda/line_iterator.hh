@@ -139,19 +139,6 @@ public:
         return *this;
     }
     
-    /**
-     * @brief Post-increment
-     */
-    line_iterator operator++(int) {
-        line_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    /**
-     * @brief Get sentinel for range-based for loops
-     */
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**
@@ -215,17 +202,6 @@ public:
         
         return *this;
     }
-    
-    /**
-     * @brief Post-increment
-     */
-    line_iterator operator++(int) {
-        line_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**

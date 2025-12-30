@@ -142,8 +142,8 @@ public:
         auto d2 = (derivative(t + h) - d1) / h;
         
         T speed = length(d1);
-        if (speed < tolerance_ * T(0.01)) {
-            return T(0.1);  // Nearly stationary
+        if (speed <= T(0) || speed < tolerance_ * T(0.01)) {
+            return T(0.1);  // Nearly stationary or zero speed
         }
         
         // Curvature = |v × a| / |v|³
@@ -239,19 +239,7 @@ public:
         dt_ = compute_adaptive_step(t_);
         
         return *this;
-    }
-    
-    /**
-     * @brief Post-increment
-     */
-    quadratic_bezier_iterator operator++(int) {
-        quadratic_bezier_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Cubic Bezier iterator
@@ -435,16 +423,7 @@ public:
         dt_ = compute_adaptive_step(t_);
         
         return *this;
-    }
-    
-    cubic_bezier_iterator operator++(int) {
-        cubic_bezier_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief General Bezier iterator for arbitrary degree
@@ -750,16 +729,7 @@ public:
         dt_ = compute_adaptive_step(t_);
         
         return *this;
-    }
-    
-    bezier_iterator operator++(int) {
-        bezier_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Antialiased cubic Bezier iterator
@@ -918,16 +888,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    aa_cubic_bezier_iterator operator++(int) {
-        aa_cubic_bezier_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Helper functions

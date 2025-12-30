@@ -78,7 +78,6 @@ TEST_CASE("B-spline iterator basic functionality") {
             CHECK(pixels.back().x >= pixels.front().x);
         } else {
             // If only one pixel, just check it exists
-            MESSAGE("Linear B-spline generated only " << pixels.size() << " pixel(s)");
             CHECK(pixels.size() >= 1);
         }
     }
@@ -163,10 +162,6 @@ TEST_CASE("Catmull-Rom spline") {
                     found_close = true;
                     break;
                 }
-            }
-            if (!found_close) {
-                MESSAGE("No pixel found within 5 units of control point (" 
-                        << target.x << ", " << target.y << ")");
             }
             CHECK(found_close);
         }

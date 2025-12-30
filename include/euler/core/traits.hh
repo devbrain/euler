@@ -308,6 +308,28 @@ struct expression_traits<scalar_expression<T>> {
     static constexpr bool row_major = true;
 };
 
+// Forward declarations for temp holders
+template<typename T> class vector_temp_holder;
+template<typename T> class matrix_temp_holder;
+
+// Expression traits for vector_temp_holder - delegates to wrapped type
+template<typename T>
+struct expression_traits<vector_temp_holder<T>> {
+    using value_type = typename expression_traits<T>::value_type;
+    static constexpr size_t rows = expression_traits<T>::rows;
+    static constexpr size_t cols = expression_traits<T>::cols;
+    static constexpr bool row_major = expression_traits<T>::row_major;
+};
+
+// Expression traits for matrix_temp_holder - delegates to wrapped type
+template<typename T>
+struct expression_traits<matrix_temp_holder<T>> {
+    using value_type = typename expression_traits<T>::value_type;
+    static constexpr size_t rows = expression_traits<T>::rows;
+    static constexpr size_t cols = expression_traits<T>::cols;
+    static constexpr bool row_major = expression_traits<T>::row_major;
+};
+
 // Fix expression traits for binary expressions with scalar broadcasting
 // When left operand is scalar (0x0), take dimensions from right operand
 template<typename R, typename Op>

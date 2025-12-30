@@ -212,19 +212,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    /**
-     * @brief Post-increment
-     */
-    aa_line_iterator operator++(int) {
-        aa_line_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Antialiased line using Gupta-Sproull algorithm (distance-based)
@@ -355,16 +343,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    gupta_sproull_line_iterator operator++(int) {
-        gupta_sproull_line_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Factory function for antialiased line iterators

@@ -281,16 +281,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    aa_bspline_iterator operator++(int) {
-        aa_bspline_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Helper to create antialiased B-spline iterator with uniform knots

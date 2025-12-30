@@ -309,17 +309,7 @@ public:
     bspline_iterator& operator++() {
         advance_to_next_pixel();
         return *this;
-    }
-
-    /**
-     * @brief Post-increment
-     */
-    bspline_iterator operator++(int) {
-        bspline_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-};
+    }};
 
 /**
  * @brief Catmull-Rom spline iterator (special case of B-spline)
@@ -508,14 +498,7 @@ public:
     catmull_rom_iterator& operator++() {
         advance_to_next_pixel();
         return *this;
-    }
-
-    catmull_rom_iterator operator++(int) {
-        catmull_rom_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-};
+    }};
 
 /**
  * @brief Factory functions with C++20 concepts

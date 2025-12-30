@@ -2,7 +2,6 @@
 
 #include <euler/matrix/matrix.hh>
 #include <euler/core/expression.hh>
-#include <euler/core/simd.hh>
 #include <type_traits>
 
 namespace euler {
@@ -46,10 +45,6 @@ struct expression_storage<matrix_inverse_expression<Expr>> {
     using type = matrix_inverse_expression<Expr>;
 };
 
-// Helper to check if SIMD is available for a type
-template<typename T>
-constexpr bool has_simd_v = simd_traits<T>::has_simd;
-
 // Forward declarations
 template<typename T, size_t M, size_t N, bool RowMajor> class matrix;
 
@@ -57,50 +52,32 @@ template<typename T, size_t M, size_t N, bool RowMajor> class matrix;
 struct matrix_add {
     template<typename T>
     static constexpr T apply(T a, T b) { return a + b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a + b; }
 };
 
 struct matrix_sub {
     template<typename T>
     static constexpr T apply(T a, T b) { return a - b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a - b; }
 };
 
 struct matrix_mul {
     template<typename T>
     static constexpr T apply(T a, T b) { return a * b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a * b; }
 };
 
 struct matrix_div {
     template<typename T>
     static constexpr T apply(T a, T b) { return a / b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a / b; }
 };
 
 // Hadamard (element-wise) operations
 struct matrix_hadamard_mul {
     template<typename T>
     static constexpr T apply(T a, T b) { return a * b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a * b; }
 };
 
 struct matrix_hadamard_div {
     template<typename T>
     static constexpr T apply(T a, T b) { return a / b; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a, T b) { return a / b; }
 };
 
 // Matrix binary expression template
@@ -151,13 +128,6 @@ public:
         }
     }
     
-    // SIMD evaluation for contiguous memory
-    template<typename Batch>
-    Batch eval_simd(size_t idx) const {
-        return Op::apply_simd(expr1_.template eval_simd<Batch>(idx),
-                             expr2_.template eval_simd<Batch>(idx));
-    }
-    
     // Element evaluation for expression interface
     constexpr value_type eval_scalar(size_t i, size_t j) const {
         return (*this)(i, j);
@@ -180,33 +150,14 @@ public:
     // Evaluate to matrix
     auto eval() const {
         matrix<value_type, rows, cols, row_major> result;
-        
-        if constexpr (has_simd_v<value_type>) {
-            constexpr size_t batch_size = simd_traits<value_type>::size;
-            const size_t simd_size = size() - (size() % batch_size);
-            
-            // SIMD evaluation
-            for (size_t i = 0; i < simd_size; i += batch_size) {
-                auto batch = eval_simd<typename simd_traits<value_type>::batch_type>(i);
-                batch.store_aligned(&result[i]);
-            }
-            
-            // Handle remainder
-            for (size_t i = simd_size; i < size(); ++i) {
-                result[i] = (*this)[i];
-            }
-        } else {
-            // Non-SIMD evaluation
-            for (size_t i = 0; i < rows; ++i) {
-                for (size_t j = 0; j < cols; ++j) {
-                    result(i, j) = (*this)(i, j);
-                }
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = (*this)(i, j);
             }
         }
-        
         return result;
     }
-    
+
 private:
     expr1_storage expr1_;
     expr2_storage expr2_;
@@ -244,17 +195,11 @@ public:
         return Op::apply(expr_[idx], scalar_);
     }
     
-    // SIMD evaluation
-    template<typename Batch>
-    Batch eval_simd(size_t idx) const {
-        return Op::apply_simd(expr_.template eval_simd<Batch>(idx), Batch(scalar_));
-    }
-    
     // Element evaluation for expression interface
     constexpr value_type eval_scalar(size_t i, size_t j) const {
         return (*this)(i, j);
     }
-    
+
     // Single index access for vector-like usage
     constexpr value_type eval_scalar(size_t idx) const {
         if constexpr (cols == 1) {
@@ -265,38 +210,19 @@ public:
             return (*this)[idx];
         }
     }
-    
+
     // Size for linear iteration
     static constexpr size_t size() { return rows * cols; }
-    
+
     // Evaluate to matrix
     auto eval() const {
         matrix<value_type, rows, cols, row_major> result;
-        
-        if constexpr (has_simd_v<value_type>) {
-            constexpr size_t batch_size = simd_traits<value_type>::size;
-            const size_t simd_size = size() - (size() % batch_size);
-            
-            // SIMD evaluation
-            for (size_t i = 0; i < simd_size; i += batch_size) {
-                auto batch = eval_simd<typename simd_traits<value_type>::batch_type>(i);
-                batch.store_aligned(&result[i]);
-            }
-            
-            // Handle remainder
-            for (size_t i = simd_size; i < size(); ++i) {
-                result[i] = (*this)[i];
-            }
-        } else {
-            // Non-SIMD evaluation
-            for (size_t i = 0; i < size(); ++i) {
-                result[i] = (*this)[i];
-            }
+        for (size_t i = 0; i < size(); ++i) {
+            result[i] = (*this)[i];
         }
-        
         return result;
     }
-    
+
 private:
     expr_storage expr_;
     Scalar scalar_;
@@ -306,9 +232,6 @@ private:
 struct matrix_negate {
     template<typename T>
     static constexpr T apply(T a) { return -a; }
-    
-    template<typename T>
-    static constexpr auto apply_simd(T a) { return -a; }
 };
 
 // Matrix unary expression template
@@ -336,17 +259,11 @@ public:
         return Op::apply(expr_[idx]);
     }
     
-    // SIMD evaluation
-    template<typename Batch>
-    Batch eval_simd(size_t idx) const {
-        return Op::apply_simd(expr_.template eval_simd<Batch>(idx));
-    }
-    
     // Element evaluation for expression interface
     constexpr value_type eval_scalar(size_t i, size_t j) const {
         return (*this)(i, j);
     }
-    
+
     // Single index access for vector-like usage
     constexpr value_type eval_scalar(size_t idx) const {
         if constexpr (cols == 1) {
@@ -357,38 +274,19 @@ public:
             return (*this)[idx];
         }
     }
-    
+
     // Size for linear iteration
     static constexpr size_t size() { return rows * cols; }
-    
+
     // Evaluate to matrix
     auto eval() const {
         matrix<value_type, rows, cols, row_major> result;
-        
-        if constexpr (has_simd_v<value_type>) {
-            constexpr size_t batch_size = simd_traits<value_type>::size;
-            const size_t simd_size = size() - (size() % batch_size);
-            
-            // SIMD evaluation
-            for (size_t i = 0; i < simd_size; i += batch_size) {
-                auto batch = eval_simd<typename simd_traits<value_type>::batch_type>(i);
-                batch.store_aligned(&result[i]);
-            }
-            
-            // Handle remainder
-            for (size_t i = simd_size; i < size(); ++i) {
-                result[i] = (*this)[i];
-            }
-        } else {
-            // Non-SIMD evaluation
-            for (size_t i = 0; i < size(); ++i) {
-                result[i] = (*this)[i];
-            }
+        for (size_t i = 0; i < size(); ++i) {
+            result[i] = (*this)[i];
         }
-        
         return result;
     }
-    
+
 private:
     expr_storage expr_;
 };
@@ -448,140 +346,186 @@ public:
     // Evaluate to matrix
     auto eval() const {
         matrix<value_type, rows, cols, row_major> result;
-        
-        // Transpose is not easily SIMD-izable in general case
         for (size_t i = 0; i < rows; ++i) {
             for (size_t j = 0; j < cols; ++j) {
                 result(i, j) = expr_(j, i);
             }
         }
-        
         return result;
     }
-    
+
 private:
     expr_storage expr_;
 };
 
 // Expression traits specializations for matrix expressions
-template<typename Expr1, typename Expr2, typename Op>
-struct expression_traits<matrix_binary_expression<Expr1, Expr2, Op>> {
-    using value_type = typename matrix_binary_expression<Expr1, Expr2, Op>::value_type;
-    static constexpr size_t rows = matrix_binary_expression<Expr1, Expr2, Op>::rows;
-    static constexpr size_t cols = matrix_binary_expression<Expr1, Expr2, Op>::cols;
-    static constexpr bool row_major = matrix_binary_expression<Expr1, Expr2, Op>::row_major;
-};
+EULER_DEFINE_EXPR_TRAITS(typename Expr1 EULER_COMMA typename Expr2 EULER_COMMA typename Op,
+                         matrix_binary_expression<Expr1 EULER_COMMA Expr2 EULER_COMMA Op>);
+EULER_DEFINE_EXPR_TRAITS(typename Expr EULER_COMMA typename Scalar EULER_COMMA typename Op,
+                         matrix_scalar_expression<Expr EULER_COMMA Scalar EULER_COMMA Op>);
+EULER_DEFINE_EXPR_TRAITS(typename Expr EULER_COMMA typename Op,
+                         matrix_unary_expression<Expr EULER_COMMA Op>);
+EULER_DEFINE_EXPR_TRAITS(typename Expr, matrix_transpose_expression<Expr>);
 
-template<typename Expr, typename Scalar, typename Op>
-struct expression_traits<matrix_scalar_expression<Expr, Scalar, Op>> {
-    using value_type = typename matrix_scalar_expression<Expr, Scalar, Op>::value_type;
-    static constexpr size_t rows = matrix_scalar_expression<Expr, Scalar, Op>::rows;
-    static constexpr size_t cols = matrix_scalar_expression<Expr, Scalar, Op>::cols;
-    static constexpr bool row_major = matrix_scalar_expression<Expr, Scalar, Op>::row_major;
-};
+// =============================================================================
+// Matrix binary expression factory with rvalue detection
+// =============================================================================
+namespace detail {
 
-template<typename Expr, typename Op>
-struct expression_traits<matrix_unary_expression<Expr, Op>> {
-    using value_type = typename matrix_unary_expression<Expr, Op>::value_type;
-    static constexpr size_t rows = matrix_unary_expression<Expr, Op>::rows;
-    static constexpr size_t cols = matrix_unary_expression<Expr, Op>::cols;
-    static constexpr bool row_major = matrix_unary_expression<Expr, Op>::row_major;
-};
+template<typename Op, typename Expr1, typename Expr2>
+auto make_matrix_binary_expr(Expr1&& e1, Expr2&& e2) {
+    decltype(auto) captured1 = capture_operand(std::forward<Expr1>(e1));
+    decltype(auto) captured2 = capture_operand(std::forward<Expr2>(e2));
+    using Captured1 = std::decay_t<decltype(captured1)>;
+    using Captured2 = std::decay_t<decltype(captured2)>;
+    return matrix_binary_expression<Captured1, Captured2, Op>(captured1, captured2);
+}
 
+// Factory for matrix-scalar expressions with rvalue detection
+template<typename Op, typename Expr, typename Scalar>
+auto make_matrix_scalar_expr(Expr&& expr, Scalar scalar) {
+    decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
+    using CapturedExpr = std::decay_t<decltype(captured)>;
+    return matrix_scalar_expression<CapturedExpr, Scalar, Op>(captured, scalar);
+}
+
+// Factory for matrix unary expressions with rvalue detection
+template<typename Op, typename Expr>
+auto make_matrix_unary_expr(Expr&& expr) {
+    decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
+    using CapturedExpr = std::decay_t<decltype(captured)>;
+    return matrix_unary_expression<CapturedExpr, Op>(captured);
+}
+
+} // namespace detail
+
+// Forward declarations for factory return types
+template<typename Expr1, typename Expr2> class matrix_multiply_expression;
+template<typename Expr> class matrix_transpose_expression;
+
+namespace detail {
+
+// Factory for matrix multiplication expressions with rvalue detection
+template<typename Expr1, typename Expr2>
+auto make_matrix_multiply_expr(Expr1&& e1, Expr2&& e2) {
+    decltype(auto) captured1 = capture_operand(std::forward<Expr1>(e1));
+    decltype(auto) captured2 = capture_operand(std::forward<Expr2>(e2));
+    using Captured1 = std::decay_t<decltype(captured1)>;
+    using Captured2 = std::decay_t<decltype(captured2)>;
+    return ::euler::matrix_multiply_expression<Captured1, Captured2>(captured1, captured2);
+}
+
+// Factory for transpose expressions with rvalue detection
 template<typename Expr>
-struct expression_traits<matrix_transpose_expression<Expr>> {
-    using value_type = typename matrix_transpose_expression<Expr>::value_type;
-    static constexpr size_t rows = matrix_transpose_expression<Expr>::rows;
-    static constexpr size_t cols = matrix_transpose_expression<Expr>::cols;
-    static constexpr bool row_major = matrix_transpose_expression<Expr>::row_major;
-};
+auto make_transpose_expr(Expr&& expr) {
+    decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
+    using CapturedExpr = std::decay_t<decltype(captured)>;
+    return ::euler::matrix_transpose_expression<CapturedExpr>(captured);
+}
+
+} // namespace detail
 
 // Operator overloads to create expressions
+// These use is_matrix_expression_v to match both concrete matrices and matrix expressions
+// The factory function handles rvalue detection and wrapping
+
 // Lvalue + Lvalue
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2>>>
 auto operator+(const Expr1& e1, const Expr2& e2) {
-    return matrix_binary_expression<Expr1, Expr2, matrix_add>(e1, e2);
+    return detail::make_matrix_binary_expr<matrix_add>(e1, e2);
 }
 
 // Rvalue + Lvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>>
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1>>>
 auto operator+(Expr1&& e1, const Expr2& e2) {
-    return matrix_binary_expression<std::decay_t<Expr1>, Expr2, matrix_add>(std::forward<Expr1>(e1), e2);
+    return detail::make_matrix_binary_expr<matrix_add>(std::forward<Expr1>(e1), e2);
 }
 
 // Lvalue + Rvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>>
+         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr2>>>
 auto operator+(const Expr1& e1, Expr2&& e2) {
-    return matrix_binary_expression<Expr1, std::decay_t<Expr2>, matrix_add>(e1, std::forward<Expr2>(e2));
+    return detail::make_matrix_binary_expr<matrix_add>(e1, std::forward<Expr2>(e2));
 }
 
 // Rvalue + Rvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>>
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1> && !std::is_lvalue_reference_v<Expr2>>,
+         typename = void>
 auto operator+(Expr1&& e1, Expr2&& e2) {
-    return matrix_binary_expression<std::decay_t<Expr1>, std::decay_t<Expr2>, matrix_add>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
+    return detail::make_matrix_binary_expr<matrix_add>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
-// Lvalue - Lvalue
+// Subtraction: Lvalue - Lvalue
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2>>>
 auto operator-(const Expr1& e1, const Expr2& e2) {
-    return matrix_binary_expression<Expr1, Expr2, matrix_sub>(e1, e2);
+    return detail::make_matrix_binary_expr<matrix_sub>(e1, e2);
 }
 
-// Rvalue - Lvalue  
+// Rvalue - Lvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>>
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1>>>
 auto operator-(Expr1&& e1, const Expr2& e2) {
-    return matrix_binary_expression<std::decay_t<Expr1>, Expr2, matrix_sub>(std::forward<Expr1>(e1), e2);
+    return detail::make_matrix_binary_expr<matrix_sub>(std::forward<Expr1>(e1), e2);
 }
 
 // Lvalue - Rvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>>
+         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr2>>>
 auto operator-(const Expr1& e1, Expr2&& e2) {
-    return matrix_binary_expression<Expr1, std::decay_t<Expr2>, matrix_sub>(e1, std::forward<Expr2>(e2));
+    return detail::make_matrix_binary_expr<matrix_sub>(e1, std::forward<Expr2>(e2));
 }
 
 // Rvalue - Rvalue
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>>
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>,
+         typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1> && !std::is_lvalue_reference_v<Expr2>>,
+         typename = void>
 auto operator-(Expr1&& e1, Expr2&& e2) {
-    return matrix_binary_expression<std::decay_t<Expr1>, std::decay_t<Expr2>, matrix_sub>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
+    return detail::make_matrix_binary_expr<matrix_sub>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
+// Scalar multiplication: expr * scalar
 template<typename Expr, typename Scalar,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr> && std::is_arithmetic_v<Scalar>>>
-auto operator*(const Expr& expr, Scalar ascalar) {
-    return matrix_scalar_expression<Expr, Scalar, matrix_mul>(expr, ascalar);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>> && std::is_arithmetic_v<Scalar>>>
+auto operator*(Expr&& expr, Scalar ascalar) {
+    return detail::make_matrix_scalar_expr<matrix_mul>(std::forward<Expr>(expr), ascalar);
 }
 
+// Scalar multiplication: scalar * expr
 template<typename Scalar, typename Expr,
-         typename = std::enable_if_t<std::is_arithmetic_v<Scalar> && is_matrix_expression_v<Expr>>>
-auto operator*(Scalar ascalar, const Expr& expr) {
-    return matrix_scalar_expression<Expr, Scalar, matrix_mul>(expr, ascalar);
+         typename = std::enable_if_t<std::is_arithmetic_v<Scalar> && is_matrix_expression_v<std::decay_t<Expr>>>>
+auto operator*(Scalar ascalar, Expr&& expr) {
+    return detail::make_matrix_scalar_expr<matrix_mul>(std::forward<Expr>(expr), ascalar);
 }
 
+// Scalar division: expr / scalar
 template<typename Expr, typename Scalar,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr> && std::is_arithmetic_v<Scalar>>>
-auto operator/(const Expr& expr, Scalar ascalar) {
-    return matrix_scalar_expression<Expr, Scalar, matrix_div>(expr, ascalar);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>> && std::is_arithmetic_v<Scalar>>>
+auto operator/(Expr&& expr, Scalar ascalar) {
+    return detail::make_matrix_scalar_expr<matrix_div>(std::forward<Expr>(expr), ascalar);
 }
 
+// Unary negation
 template<typename Expr,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr>>>
-auto operator-(const Expr& expr) {
-    return matrix_unary_expression<Expr, matrix_negate>(expr);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>>>>
+auto operator-(Expr&& expr) {
+    return detail::make_matrix_unary_expr<matrix_negate>(std::forward<Expr>(expr));
 }
 
 // Lazy transpose function
 template<typename Expr,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr>>>
-auto transpose_expr(const Expr& expr) {
-    return matrix_transpose_expression<Expr>(expr);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>>>>
+auto transpose_expr(Expr&& expr) {
+    return detail::make_transpose_expr(std::forward<Expr>(expr));
 }
 
 // Matrix multiplication expression template
@@ -609,7 +553,7 @@ public:
                   "Matrix dimensions must be compatible for multiplication");
     
     static constexpr size_t inner_dim = expression_traits<Expr1>::cols;
-    
+
     constexpr matrix_multiply_expression(const Expr1& e1, const Expr2& e2)
         : expr1_(e1), expr2_(e2) {}
     
@@ -657,70 +601,56 @@ public:
     // Evaluate to matrix
     auto eval() const {
         matrix<value_type, rows, cols, row_major> result;
-        
-        // Use specialized multiplication if available
-        if constexpr (rows <= 4 && cols <= 4 && inner_dim <= 4 && 
-                      std::is_same_v<value_type, float>) {
-            // Could use specialized SIMD multiplication here
-            for (size_t i = 0; i < rows; ++i) {
-                for (size_t j = 0; j < cols; ++j) {
-                    result(i, j) = (*this)(i, j);
-                }
-            }
-        } else {
-            // General case
-            for (size_t i = 0; i < rows; ++i) {
-                for (size_t j = 0; j < cols; ++j) {
-                    result(i, j) = (*this)(i, j);
-                }
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = (*this)(i, j);
             }
         }
-        
         return result;
     }
-    
-    // SIMD evaluation is complex for matrix multiplication
-    // For now, we'll rely on specialized implementations in eval()
-    
+
 private:
     expr1_storage expr1_;
     expr2_storage expr2_;
 };
 
 // Expression traits specialization
-template<typename Expr1, typename Expr2>
-struct expression_traits<matrix_multiply_expression<Expr1, Expr2>> {
-    using value_type = typename matrix_multiply_expression<Expr1, Expr2>::value_type;
-    static constexpr size_t rows = matrix_multiply_expression<Expr1, Expr2>::rows;
-    static constexpr size_t cols = matrix_multiply_expression<Expr1, Expr2>::cols;
-    static constexpr bool row_major = matrix_multiply_expression<Expr1, Expr2>::row_major;
-};
+EULER_DEFINE_EXPR_TRAITS(typename Expr1 EULER_COMMA typename Expr2,
+                         matrix_multiply_expression<Expr1 EULER_COMMA Expr2>);
 
 // Operator overload for matrix multiplication expression - creates expression for all matrix types
 // Works for any compatible matrix dimensions
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2> &&
-                                     expression_traits<Expr1>::cols == expression_traits<Expr2>::rows>>
-auto operator*(const Expr1& e1, const Expr2& e2) {
-    return matrix_multiply_expression<Expr1, Expr2>(e1, e2);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> &&
+                                     is_matrix_expression_v<std::decay_t<Expr2>> &&
+                                     expression_traits<std::decay_t<Expr1>>::cols ==
+                                     expression_traits<std::decay_t<Expr2>>::rows>>
+auto operator*(Expr1&& e1, Expr2&& e2) {
+    return detail::make_matrix_multiply_expr(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
 // Hadamard (element-wise) multiplication - creates expression for lazy evaluation
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2> &&
-                                     expression_traits<Expr1>::rows == expression_traits<Expr2>::rows &&
-                                     expression_traits<Expr1>::cols == expression_traits<Expr2>::cols>>
-auto hadamard(const Expr1& e1, const Expr2& e2) {
-    return matrix_binary_expression<Expr1, Expr2, matrix_hadamard_mul>(e1, e2);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> &&
+                                     is_matrix_expression_v<std::decay_t<Expr2>> &&
+                                     expression_traits<std::decay_t<Expr1>>::rows ==
+                                     expression_traits<std::decay_t<Expr2>>::rows &&
+                                     expression_traits<std::decay_t<Expr1>>::cols ==
+                                     expression_traits<std::decay_t<Expr2>>::cols>>
+auto hadamard(Expr1&& e1, Expr2&& e2) {
+    return detail::make_matrix_binary_expr<matrix_hadamard_mul>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
 // Hadamard (element-wise) division - creates expression for lazy evaluation
 template<typename Expr1, typename Expr2,
-         typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2> &&
-                                     expression_traits<Expr1>::rows == expression_traits<Expr2>::rows &&
-                                     expression_traits<Expr1>::cols == expression_traits<Expr2>::cols>>
-auto hadamard_div(const Expr1& e1, const Expr2& e2) {
-    return matrix_binary_expression<Expr1, Expr2, matrix_hadamard_div>(e1, e2);
+         typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> &&
+                                     is_matrix_expression_v<std::decay_t<Expr2>> &&
+                                     expression_traits<std::decay_t<Expr1>>::rows ==
+                                     expression_traits<std::decay_t<Expr2>>::rows &&
+                                     expression_traits<std::decay_t<Expr1>>::cols ==
+                                     expression_traits<std::decay_t<Expr2>>::cols>>
+auto hadamard_div(Expr1&& e1, Expr2&& e2) {
+    return detail::make_matrix_binary_expr<matrix_hadamard_div>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
 // Matrix inverse expression template
@@ -736,7 +666,7 @@ public:
     static constexpr size_t static_size = rows * cols;
 
     static_assert(rows == cols, "Inverse is only defined for square matrices");
-    
+
     explicit matrix_inverse_expression(const Expr& expr)
         : expr_(expr), inverse_computed_(false), cached_inverse_() {}
     
@@ -819,13 +749,7 @@ private:
 };
 
 // Expression traits specialization
-template<typename Expr>
-struct expression_traits<matrix_inverse_expression<Expr>> {
-    using value_type = typename matrix_inverse_expression<Expr>::value_type;
-    static constexpr size_t rows = matrix_inverse_expression<Expr>::rows;
-    static constexpr size_t cols = matrix_inverse_expression<Expr>::cols;
-    static constexpr bool row_major = matrix_inverse_expression<Expr>::row_major;
-};
+EULER_DEFINE_EXPR_TRAITS(typename Expr, matrix_inverse_expression<Expr>);
 
 // Forward declaration for vector
 template<typename T, size_t N> class vector;
@@ -847,7 +771,7 @@ public:
 
     static_assert(mat_traits::cols == vec_traits::rows || mat_traits::cols == vec_traits::cols,
                   "Matrix columns must match vector size");
-    
+
     matrix_vector_multiply_expression(const MatExpr& mat, const VecExpr& vec)
         : mat_(mat), vec_(vec) {}
     
@@ -910,7 +834,7 @@ public:
 
     static_assert(vec_traits::rows == mat_traits::rows || vec_traits::cols == mat_traits::rows,
                   "Vector size must match matrix rows");
-    
+
     vector_matrix_multiply_expression(const VecExpr& vec, const MatExpr& mat)
         : vec_(vec), mat_(mat) {}
     
@@ -968,20 +892,9 @@ struct expression_storage<vector_matrix_multiply_expression<VecExpr, MatExpr>> {
 };
 
 // Expression traits specializations
-template<typename MatExpr, typename VecExpr>
-struct expression_traits<matrix_vector_multiply_expression<MatExpr, VecExpr>> {
-    using value_type = typename matrix_vector_multiply_expression<MatExpr, VecExpr>::value_type;
-    static constexpr size_t rows = matrix_vector_multiply_expression<MatExpr, VecExpr>::rows;
-    static constexpr size_t cols = matrix_vector_multiply_expression<MatExpr, VecExpr>::cols;
-    static constexpr bool row_major = matrix_vector_multiply_expression<MatExpr, VecExpr>::row_major;
-};
-
-template<typename VecExpr, typename MatExpr>
-struct expression_traits<vector_matrix_multiply_expression<VecExpr, MatExpr>> {
-    using value_type = typename vector_matrix_multiply_expression<VecExpr, MatExpr>::value_type;
-    static constexpr size_t rows = vector_matrix_multiply_expression<VecExpr, MatExpr>::rows;
-    static constexpr size_t cols = vector_matrix_multiply_expression<VecExpr, MatExpr>::cols;
-    static constexpr bool row_major = vector_matrix_multiply_expression<VecExpr, MatExpr>::row_major;
-};
+EULER_DEFINE_EXPR_TRAITS(typename MatExpr EULER_COMMA typename VecExpr,
+                         matrix_vector_multiply_expression<MatExpr EULER_COMMA VecExpr>);
+EULER_DEFINE_EXPR_TRAITS(typename VecExpr EULER_COMMA typename MatExpr,
+                         vector_matrix_multiply_expression<VecExpr EULER_COMMA MatExpr>);
 
 } // namespace euler

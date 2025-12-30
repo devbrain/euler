@@ -38,14 +38,14 @@ int main() {
     auto end = std::chrono::high_resolution_clock::now();
     auto expr_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     
-    // Test direct SIMD multiplication
+    // Test specialized multiplication
     start = std::chrono::high_resolution_clock::now();
     matrix4<float> result2;
     for (int i = 0; i < iterations; ++i) {
-        result2 = multiply_4x4_simd(a, b);  // Direct SIMD
+        result2 = multiply_4x4(a, b);  // Specialized unrolled
     }
     end = std::chrono::high_resolution_clock::now();
-    auto simd_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    auto specialized_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     
     // Test direct multiplication
     start = std::chrono::high_resolution_clock::now();
@@ -57,7 +57,7 @@ int main() {
     auto direct_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     
     std::cout << "Expression template time: " << expr_time << " us" << std::endl;
-    std::cout << "Direct SIMD time: " << simd_time << " us" << std::endl;
+    std::cout << "Specialized multiply time: " << specialized_time << " us" << std::endl;
     std::cout << "Direct multiply time: " << direct_time << " us" << std::endl;
     
     // Verify results are the same

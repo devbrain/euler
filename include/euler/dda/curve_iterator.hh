@@ -184,19 +184,7 @@ public:
         first_pixel_ = false;
         
         return *this;
-    }
-    
-    /**
-     * @brief Post-increment
-     */
-    curve_iterator operator++(int) {
-        curve_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Helper to create parametric curve iterator

@@ -315,9 +315,9 @@ public:
      * @return Reference to this complex number
      * @details Scales both real and imaginary parts: (a+bi) * s = (as) + (bs)i
      */
-    complex& operator*=(T ascalar) {
-        real_ *= ascalar;
-        imag_ *= ascalar;
+    complex& operator*=(T s) {
+        real_ *= s;
+        imag_ *= s;
         return *this;
     }
     
@@ -328,12 +328,12 @@ public:
      * @details Scales both real and imaginary parts: (a+bi) / s = (a/s) + (b/s)i
      * @warning Division by zero results in undefined behavior
      */
-    complex& operator/=(T ascalar) {
-        EULER_CHECK(std::abs(ascalar) > constants<T>::epsilon,
+    complex& operator/=(T s) {
+        EULER_CHECK(std::abs(s) > constants<T>::epsilon,
                     error_code::invalid_argument,
-                    "Division by zero or near-zero value in complex: ", ascalar);
-        real_ /= ascalar;
-        imag_ /= ascalar;
+                    "Division by zero or near-zero value in complex: ", s);
+        real_ /= s;
+        imag_ /= s;
         return *this;
     }
     

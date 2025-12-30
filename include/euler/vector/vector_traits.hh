@@ -12,6 +12,8 @@ template<typename T, size_t N> class row_vector;
 template<typename T, size_t R, size_t C, bool RowMajor> class matrix;
 template<typename T> class matrix_view;
 template<typename T> class const_matrix_view;
+template<typename T> class vector_temp_holder;
+template<typename T> class matrix_temp_holder;
 
 // Expression templates forward declarations
 template<typename Derived, typename T> class expression;
@@ -85,6 +87,18 @@ struct get_vector_dimension<matrix_view<T>> {
 template<typename T>
 struct get_vector_dimension<const_matrix_view<T>> {
     static constexpr size_t value = 0;  // Dynamic size
+};
+
+// Specialization for vector_temp_holder - delegates to wrapped type
+template<typename T>
+struct get_vector_dimension<vector_temp_holder<T>> {
+    static constexpr size_t value = get_vector_dimension<T>::value;
+};
+
+// Specialization for matrix_temp_holder - delegates to wrapped type
+template<typename T>
+struct get_vector_dimension<matrix_temp_holder<T>> {
+    static constexpr size_t value = get_vector_dimension<T>::value;
 };
 
 // Specializations for known expression types

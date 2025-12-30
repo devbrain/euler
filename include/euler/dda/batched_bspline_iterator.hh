@@ -96,7 +96,7 @@ private:
     // Prefetch distance (in parameter space)
     static constexpr T PREFETCH_T_AHEAD = T(0.1);
     
-    // Cache for basis function values
+    // Cache for basis function values (mutable for lazy evaluation in const methods)
     mutable std::vector<T> basis_cache_;
     mutable int last_span_ = -1;
     mutable T last_t_ = T(-1);

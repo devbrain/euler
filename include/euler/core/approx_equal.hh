@@ -2,7 +2,6 @@
 
 #include <euler/core/traits.hh>
 #include <euler/core/types.hh>
-#include <euler/core/simd.hh>
 #include <type_traits>
 #include <cmath>
 
@@ -121,52 +120,19 @@ struct get_value_type<T, std::enable_if_t<is_complex_type_v<T>>> {
 template<typename T>
 using get_value_type_t = typename get_value_type<T>::type;
 
-// SIMD optimized approximate equality comparison
+// Approximate equality comparison for arrays
 template<typename T>
-bool simd_approx_equal(const T* a, const T* b, size_t size, T tolerance) {
-    using simd = simd_ops<T>;
-    using batch_type = typename simd::batch_type;
-    constexpr size_t batch_size = simd::batch_size;
-    
-    size_t simd_size = size - (size % batch_size);
-    
-    // Process aligned SIMD batches
-    for (size_t i = 0; i < simd_size; i += batch_size) {
-        batch_type batch_a = simd::load_unaligned(a + i);
-        batch_type batch_b = simd::load_unaligned(b + i);
-        batch_type diff = simd::abs(simd::sub(batch_a, batch_b));
-        
-        // Check if any element exceeds tolerance
-        if constexpr (simd_traits<T>::has_simd) {
-            #ifdef EULER_HAS_XSIMD
-            auto mask = diff > batch_type(tolerance);
-            if (xsimd::any(mask)) {
-                return false;
-            }
-            #else
-            if (diff > tolerance) {
-                return false;
-            }
-            #endif
-        } else {
-            if (diff > tolerance) {
-                return false;
-            }
-        }
-    }
-    
-    // Process remaining elements
-    for (size_t i = simd_size; i < size; ++i) {
+bool approx_equal_array(const T* a, const T* b, size_t size, T tolerance) {
+    for (size_t i = 0; i < size; ++i) {
         if (std::abs(a[i] - b[i]) > tolerance) {
             return false;
         }
     }
-    
     return true;
 }
 
 // Generic approximate equality comparison
-// This function evaluates expressions and uses SIMD-optimized comparisons where possible
+// This function evaluates expressions and compares element by element.
 // Since this is typically the last point where expressions are used, evaluation is performed immediately
 template<typename T1, typename T2,
          typename = std::enable_if_t<have_compatible_dimensions<T1, T2>()>>
@@ -252,7 +218,7 @@ bool approx_equal(const T1& a, const T2& b,
             vector<value_type, size> vec_a(a);
             vector<value_type, size> vec_b(b);
             
-            return simd_approx_equal(vec_a.data(), vec_b.data(), size, tolerance);
+            return approx_equal_array(vec_a.data(), vec_b.data(), size, tolerance);
         }
         else if constexpr (is_vector_v<T1> && !is_vector_v<T2>) {
             // Vector vs matrix expression (1xN or Nx1)
@@ -261,10 +227,10 @@ bool approx_equal(const T1& a, const T2& b,
             
             if constexpr (expression_traits<T2>::rows == 1) {
                 matrix<value_type, 1, size, true> mat_b(b);
-                return simd_approx_equal(vec_a.data(), mat_b.data(), size, tolerance);
+                return approx_equal_array(vec_a.data(), mat_b.data(), size, tolerance);
             } else {
                 matrix<value_type, size, 1, true> mat_b(b);
-                return simd_approx_equal(vec_a.data(), mat_b.data(), size, tolerance);
+                return approx_equal_array(vec_a.data(), mat_b.data(), size, tolerance);
             }
 
         }
@@ -279,13 +245,13 @@ bool approx_equal(const T1& a, const T2& b,
                 // Both row vectors
                 matrix<value_type, 1, size, true> mat_a(a);
                 matrix<value_type, 1, size, true> mat_b(b);
-                return simd_approx_equal(mat_a.data(), mat_b.data(), size, tolerance);
+                return approx_equal_array(mat_a.data(), mat_b.data(), size, tolerance);
             }
             else if constexpr (expression_traits<T1>::cols == 1 && expression_traits<T2>::cols == 1) {
                 // Both column vectors
                 matrix<value_type, size, 1, true> mat_a(a);
                 matrix<value_type, size, 1, true> mat_b(b);
-                return simd_approx_equal(mat_a.data(), mat_b.data(), size, tolerance);
+                return approx_equal_array(mat_a.data(), mat_b.data(), size, tolerance);
             }
             else {
                 // Mixed row/column - evaluate to same format
@@ -293,7 +259,7 @@ bool approx_equal(const T1& a, const T2& b,
                     matrix<value_type, size, 1, true>(transpose(a)) : matrix<value_type, size, 1, true>(a);
                 matrix<value_type, size, 1, true> mat_b = expression_traits<T2>::rows == 1 ? 
                     matrix<value_type, size, 1, true>(transpose(b)) : matrix<value_type, size, 1, true>(b);
-                return simd_approx_equal(mat_a.data(), mat_b.data(), size, tolerance);
+                return approx_equal_array(mat_a.data(), mat_b.data(), size, tolerance);
             }
 
         }
@@ -310,7 +276,7 @@ bool approx_equal(const T1& a, const T2& b,
         matrix<value_type, rows, cols, row_major> mat_b(b);
         
         // Use SIMD optimized comparison for contiguous data
-        return simd_approx_equal(mat_a.data(), mat_b.data(), rows * cols, tolerance);
+        return approx_equal_array(mat_a.data(), mat_b.data(), rows * cols, tolerance);
     }
     else {
         // This should never be reached due to SFINAE, but needed for completeness

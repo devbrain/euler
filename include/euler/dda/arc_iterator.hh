@@ -281,19 +281,7 @@ public:
         } while (y_ <= radius_);
         
         return *this;
-    }
-    
-    /**
-     * @brief Post-increment
-     */
-    filled_arc_iterator operator++(int) {
-        filled_arc_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Antialiased circle iterator
@@ -446,16 +434,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    aa_circle_iterator operator++(int) {
-        aa_circle_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Filled ellipse arc iterator
@@ -681,16 +660,7 @@ public:
         } while (y_ <= b_);
         
         return *this;
-    }
-    
-    filled_ellipse_arc_iterator operator++(int) {
-        filled_ellipse_arc_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Antialiased ellipse arc iterator
@@ -818,16 +788,7 @@ public:
             generate_pixels();
         }
         return *this;
-    }
-    
-    aa_ellipse_arc_iterator operator++(int) {
-        aa_ellipse_arc_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
-};
+    }};
 
 /**
  * @brief Helper functions for arc iterators

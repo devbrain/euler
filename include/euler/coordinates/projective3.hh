@@ -128,9 +128,12 @@ struct projective3 {
      */
     constexpr T& operator[](size_t i) {
         EULER_CHECK_INDEX(i, 4);
-        return (&x)[i];
+        if (i == 0) return x;
+        if (i == 1) return y;
+        if (i == 2) return z;
+        return w;
     }
-    
+
     /**
      * @brief Access coordinates by index (const)
      * @param i Index (0=x, 1=y, 2=z, 3=w)
@@ -138,7 +141,10 @@ struct projective3 {
      */
     constexpr const T& operator[](size_t i) const {
         EULER_CHECK_INDEX(i, 4);
-        return (&x)[i];
+        if (i == 0) return x;
+        if (i == 1) return y;
+        if (i == 2) return z;
+        return w;
     }
     
     /**

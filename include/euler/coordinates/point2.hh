@@ -87,19 +87,21 @@ struct point2 {
      * @param i Index (0=x, 1=y)
      * @return Reference to coordinate
      */
-    constexpr T& operator[](size_t i) { 
+    constexpr T& operator[](size_t i) {
         EULER_CHECK_INDEX(i, 2);
-        return (&x)[i]; 
+        if (i == 0) return x;
+        return y;
     }
-    
+
     /**
      * @brief Access coordinates by index (const)
      * @param i Index (0=x, 1=y)
      * @return Const reference to coordinate
      */
-    constexpr const T& operator[](size_t i) const { 
+    constexpr const T& operator[](size_t i) const {
         EULER_CHECK_INDEX(i, 2);
-        return (&x)[i]; 
+        if (i == 0) return x;
+        return y;
     }
     
     // Swizzling operations

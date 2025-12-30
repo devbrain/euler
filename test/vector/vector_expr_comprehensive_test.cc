@@ -24,8 +24,6 @@ bool vec_approx_equal(const Vec& a, const Vec& b, typename Vec::value_type eps =
     SUBCASE(name " - with SIMD") { \
         if (euler::simd_traits<float>::has_simd) { \
             test_impl(true); \
-        } else { \
-            MESSAGE("SIMD not available, skipping SIMD test"); \
         } \
     } \
     SUBCASE(name " - without SIMD") { \
@@ -403,14 +401,6 @@ TEST_CASE("euler::vector SIMD verification") {
             vec4f result = expr;
             
             CHECK(vec_approx_equal(result, vec4f(6.0f, 8.0f, 10.0f, 12.0f)));
-            MESSAGE("SIMD is available and being used");
-            #ifdef EULER_HAS_XSIMD
-            MESSAGE("xsimd is enabled");
-            #else
-            MESSAGE("xsimd is not enabled");
-            #endif
-        } else {
-            MESSAGE("SIMD is not available on this platform");
         }
     }
     

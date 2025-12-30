@@ -11,6 +11,27 @@
 #include <vector>
 #include <cmath>
 #include <typeinfo>
+#include <cstdlib>
+#include <new>
+
+// Aligned allocation helpers (benchmark-local)
+namespace {
+template<typename T>
+T* aligned_alloc_local(size_t count) {
+    constexpr size_t alignment = 64;  // Cache line alignment
+    size_t size = count * sizeof(T);
+    // Round up to alignment boundary
+    size = (size + alignment - 1) & ~(alignment - 1);
+    void* ptr = std::aligned_alloc(alignment, size);
+    if (!ptr) throw std::bad_alloc();
+    return static_cast<T*>(ptr);
+}
+
+template<typename T>
+void aligned_free_local(T* ptr) {
+    std::free(ptr);
+}
+}
 
 using namespace euler;
 using namespace euler::benchmark;
@@ -181,10 +202,10 @@ void benchmark_array_operations(size_t size) {
     std::uniform_real_distribution<T> dist(-1.0, 1.0);
     
     // Allocate aligned memory
-    T* a = aligned_alloc<T>(size);
-    T* b = aligned_alloc<T>(size);
-    T* c = aligned_alloc<T>(size);
-    T* result = aligned_alloc<T>(size);
+    T* a = aligned_alloc_local<T>(size);
+    T* b = aligned_alloc_local<T>(size);
+    T* c = aligned_alloc_local<T>(size);
+    T* result = aligned_alloc_local<T>(size);
     
     for (size_t i = 0; i < size; ++i) {
         a[i] = dist(gen);
@@ -194,10 +215,10 @@ void benchmark_array_operations(size_t size) {
     
     // Ensure cleanup at end of function
     auto cleanup = [&]() {
-        aligned_free(a);
-        aligned_free(b);
-        aligned_free(c);
-        aligned_free(result);
+        aligned_free_local(a);
+        aligned_free_local(b);
+        aligned_free_local(c);
+        aligned_free_local(result);
     };
     
     // Addition benchmark
@@ -387,16 +408,16 @@ void benchmark_transcendental_functions(size_t size) {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<T> dist(0.1, 10.0);
     
-    T* input = aligned_alloc<T>(size);
-    T* output = aligned_alloc<T>(size);
-    
+    T* input = aligned_alloc_local<T>(size);
+    T* output = aligned_alloc_local<T>(size);
+
     for (size_t i = 0; i < size; ++i) {
         input[i] = dist(gen);
     }
-    
+
     auto cleanup = [&]() {
-        aligned_free(input);
-        aligned_free(output);
+        aligned_free_local(input);
+        aligned_free_local(output);
     };
     
     // Square root benchmark

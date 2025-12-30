@@ -120,19 +120,23 @@ struct point3 {
      * @param i Index (0=x, 1=y, 2=z)
      * @return Reference to coordinate
      */
-    constexpr T& operator[](size_t i) { 
+    constexpr T& operator[](size_t i) {
         EULER_CHECK_INDEX(i, 3);
-        return (&x)[i]; 
+        if (i == 0) return x;
+        if (i == 1) return y;
+        return z;
     }
-    
+
     /**
      * @brief Access coordinates by index (const)
      * @param i Index (0=x, 1=y, 2=z)
      * @return Const reference to coordinate
      */
-    constexpr const T& operator[](size_t i) const { 
+    constexpr const T& operator[](size_t i) const {
         EULER_CHECK_INDEX(i, 3);
-        return (&x)[i]; 
+        if (i == 0) return x;
+        if (i == 1) return y;
+        return z;
     }
     
     // 2D projection swizzles

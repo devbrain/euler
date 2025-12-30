@@ -296,8 +296,20 @@ matrix<T, 4, 4> look_at(const point3<T>& eye, const point3<T>& center,
 template<typename Angle, typename T = typename Angle::value_type>
 matrix<T, 4, 4> perspective(const Angle& fovy, T aspect, T z_near, T z_far) {
     static_assert(is_angle_v<Angle>, "perspective requires angle type");
+
+    EULER_CHECK(aspect > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "perspective: aspect ratio must be positive");
+    EULER_CHECK(std::abs(z_near - z_far) > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "perspective: z_near and z_far must be different");
+
     auto fovy_rad = to_radians(fovy);
-    T f = T(1) / tan(fovy_rad / 2);
+    T half_fovy = fovy_rad / T(2);
+    T tan_half_fovy = tan(half_fovy);
+
+    EULER_CHECK(std::abs(tan_half_fovy) > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "perspective: fovy must not be 0 or pi");
+
+    T f = T(1) / tan_half_fovy;
     T nf = T(1) / (z_near - z_far);
 
     return {
@@ -320,6 +332,13 @@ matrix<T, 4, 4> perspective(const Angle& fovy, T aspect, T z_near, T z_far) {
  */
 template<typename T>
 matrix<T, 4, 4> ortho(T left, T right, T bottom, T top, T z_near, T z_far) {
+    EULER_CHECK(std::abs(right - left) > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "ortho: right and left must be different");
+    EULER_CHECK(std::abs(top - bottom) > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "ortho: top and bottom must be different");
+    EULER_CHECK(std::abs(z_far - z_near) > std::numeric_limits<T>::epsilon(),
+                error_code::invalid_argument, "ortho: z_far and z_near must be different");
+
     T rl = T(1) / (right - left);
     T tb = T(1) / (top - bottom);
     T fn = T(1) / (z_far - z_near);

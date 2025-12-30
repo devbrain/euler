@@ -247,17 +247,6 @@ public:
         return *this;
     }
     EULER_DISABLE_WARNING_POP
-    
-    /**
-     * @brief Post-increment
-     */
-    ellipse_iterator operator++(int) {
-        ellipse_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**
@@ -332,17 +321,6 @@ public:
         }
         return *this;
     }
-    
-    /**
-     * @brief Post-increment
-     */
-    filled_ellipse_iterator operator++(int) {
-        filled_ellipse_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**
@@ -467,17 +445,6 @@ public:
         }
         return *this;
     }
-    
-    /**
-     * @brief Post-increment
-     */
-    aa_ellipse_iterator operator++(int) {
-        aa_ellipse_iterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-    
-    static constexpr dda_sentinel end() { return {}; }
 };
 
 /**

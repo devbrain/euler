@@ -194,6 +194,13 @@ struct dda_sentinel {};
 
 /**
  * @brief Base class for DDA iterators (CRTP)
+ *
+ * Provides common functionality for all DDA iterators:
+ * - Type aliases for iterator traits
+ * - done_ flag for end-of-iteration detection
+ * - Comparison operators with sentinel and other iterators
+ * - Post-increment operator (delegates to pre-increment)
+ * - Static end() method returning sentinel
  */
 template<typename Derived, typename ValueType, typename CoordType>
 class dda_iterator_base {
@@ -205,28 +212,38 @@ public:
     using difference_type = std::ptrdiff_t;
     using pointer = value_type*;
     using reference = value_type&;
-    
+
 protected:
     bool done_ = false;
-    
+
 public:
     /// Check if iterator is at end
     constexpr bool is_done() const { return done_; }
-    
+
+    /// Post-increment operator (delegates to derived class's pre-increment)
+    Derived operator++(int) {
+        Derived tmp = *static_cast<Derived*>(this);
+        ++(*static_cast<Derived*>(this));
+        return tmp;
+    }
+
+    /// Sentinel for end of iteration
+    static constexpr dda_sentinel end() { return {}; }
+
     /// Comparison with sentinel
     friend constexpr bool operator==(const Derived& lhs, dda_sentinel) {
         return lhs.is_done();
     }
-    
+
     friend constexpr bool operator!=(const Derived& lhs, dda_sentinel) {
         return !lhs.is_done();
     }
-    
+
     /// Comparison with other iterator
     friend constexpr bool operator==(const Derived& lhs, const Derived& rhs) {
         return lhs.done_ == rhs.done_;
     }
-    
+
     friend constexpr bool operator!=(const Derived& lhs, const Derived& rhs) {
         return !(lhs == rhs);
     }
