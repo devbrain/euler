@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <euler/dda/dda_traits.hh>
 #include <euler/dda/line_iterator.hh>
 #include <euler/dda/circle_iterator.hh>

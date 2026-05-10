@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <euler/core/types.hh>
 #include <euler/core/traits.hh>
 #include <concepts>

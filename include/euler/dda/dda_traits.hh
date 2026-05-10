@@ -14,6 +14,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <euler/coordinates/point2.hh>
 #include <euler/core/types.hh>
 #include <iterator>
