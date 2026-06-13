@@ -56,13 +56,13 @@ public:
     vector() = default;
     
     // Constructor from scalar (fills all components)
-    explicit vector(T value) : base_type(value) {}
+    explicit constexpr vector(T value) noexcept : base_type(value) {}
     
     // Variadic constructor for convenient initialization
     template<typename... Args, 
              typename = std::enable_if_t<sizeof...(Args) == N && 
                                          (std::is_convertible_v<Args, T> && ...)>>
-    vector(Args... args) {
+    constexpr vector(Args... args) noexcept {
         static_assert(sizeof...(Args) == N, "Number of arguments must match vector dimension");
         std::array<T, N> values = {static_cast<T>(args)...};
         for (size_t i = 0; i < N; ++i) {
@@ -71,13 +71,13 @@ public:
     }
     
     // Constructor from base matrix
-    explicit vector(const base_type& m) : base_type(m) {}
+    explicit constexpr vector(const base_type& m) noexcept : base_type(m) {}
     
     // Implicit conversion from any matrix with matching element count
     // This allows seamless conversion between row/column vectors
     template<size_t R, size_t C, bool Layout,
              typename = std::enable_if_t<R * C == N>>
-    vector(const matrix<T, R, C, Layout>& m) {
+    constexpr vector(const matrix<T, R, C, Layout>& m) noexcept {
         // Just copy the elements linearly - vectors are always stored contiguously
         for (size_t i = 0; i < N; ++i) {
             (*this)[i] = m[i];
@@ -85,63 +85,63 @@ public:
     }
     
     // Element access using indices instead of (i, 0)
-    reference operator[](size_t idx) {
+    constexpr reference operator[](size_t idx) noexcept {
         return base_type::operator[](idx);
     }
     
-    const_reference operator[](size_t idx) const {
+    constexpr const_reference operator[](size_t idx) const noexcept {
         return base_type::operator[](idx);
     }
     
     // Named component access for common sizes
     template<size_t M = N>
-    std::enable_if_t<M >= 1, reference> x() { return (*this)[0]; }
+    std::enable_if_t<M >= 1, reference> constexpr x() noexcept { return (*this)[0]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 1, const_reference> x() const { return (*this)[0]; }
+    std::enable_if_t<M >= 1, const_reference> constexpr x() const noexcept { return (*this)[0]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 2, reference> y() { return (*this)[1]; }
+    std::enable_if_t<M >= 2, reference> constexpr y() noexcept { return (*this)[1]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 2, const_reference> y() const { return (*this)[1]; }
+    std::enable_if_t<M >= 2, const_reference> constexpr y() const noexcept { return (*this)[1]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 3, reference> z() { return (*this)[2]; }
+    std::enable_if_t<M >= 3, reference> constexpr z() noexcept { return (*this)[2]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 3, const_reference> z() const { return (*this)[2]; }
+    std::enable_if_t<M >= 3, const_reference> constexpr z() const noexcept { return (*this)[2]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 4, reference> w() { return (*this)[3]; }
+    std::enable_if_t<M >= 4, reference> constexpr w() noexcept { return (*this)[3]; }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 4, const_reference> w() const { return (*this)[3]; }
+    std::enable_if_t<M >= 4, const_reference> constexpr w() const noexcept { return (*this)[3]; }
     
     // Alternative names for components
     template<size_t M = N>
-    std::enable_if_t<M >= 1, reference> r() { return x(); }
+    std::enable_if_t<M >= 1, reference> constexpr r() noexcept { return x(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 1, const_reference> r() const { return x(); }
+    std::enable_if_t<M >= 1, const_reference> constexpr r() const noexcept { return x(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 2, reference> g() { return y(); }
+    std::enable_if_t<M >= 2, reference> constexpr g() noexcept { return y(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 2, const_reference> g() const { return y(); }
+    std::enable_if_t<M >= 2, const_reference> constexpr g() const noexcept { return y(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 3, reference> b() { return z(); }
+    std::enable_if_t<M >= 3, reference> constexpr b() noexcept { return z(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 3, const_reference> b() const { return z(); }
+    std::enable_if_t<M >= 3, const_reference> constexpr b() const noexcept { return z(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 4, reference> a() { return w(); }
+    std::enable_if_t<M >= 4, reference> constexpr a() noexcept { return w(); }
     
     template<size_t M = N>
-    std::enable_if_t<M >= 4, const_reference> a() const { return w(); }
+    std::enable_if_t<M >= 4, const_reference> constexpr a() const noexcept { return w(); }
     
     // Length/magnitude operations
     constexpr T length_squared() const {
@@ -230,25 +230,25 @@ public:
     column_vector() = default;
     
     // Conversion from row vector
-    explicit column_vector(const matrix<T, 1, N>& row_vec) {
+    explicit constexpr column_vector(const matrix<T, 1, N>& row_vec) noexcept {
         for (size_t i = 0; i < N; ++i) {
             (*this)[i] = row_vec[i];
         }
     }
     
     // Conversion from generic vector
-    explicit column_vector(const vector<T, N>& v) {
+    explicit constexpr column_vector(const vector<T, N>& v) noexcept {
         for (size_t i = 0; i < N; ++i) {
             (*this)[i] = v[i];
         }
     }
     
     // Convenience element access
-    reference operator[](size_t idx) {
+    constexpr reference operator[](size_t idx) noexcept {
         return base_type::operator[](idx);
     }
     
-    const_reference operator[](size_t idx) const {
+    constexpr const_reference operator[](size_t idx) const noexcept {
         return base_type::operator[](idx);
     }
 };
@@ -284,25 +284,25 @@ public:
     }
     
     // Conversion from column vector
-    explicit row_vector(const matrix<T, N, 1>& col_vec) {
+    explicit constexpr row_vector(const matrix<T, N, 1>& col_vec) noexcept {
         for (size_t i = 0; i < N; ++i) {
             (*this)[i] = col_vec[i];
         }
     }
     
     // Conversion from generic vector
-    explicit row_vector(const vector<T, N>& v) {
+    explicit constexpr row_vector(const vector<T, N>& v) noexcept {
         for (size_t i = 0; i < N; ++i) {
             (*this)[i] = v[i];
         }
     }
     
     // Convenience element access
-    reference operator[](size_t idx) {
+    constexpr reference operator[](size_t idx) noexcept {
         return base_type::operator[](idx);
     }
     
-    const_reference operator[](size_t idx) const {
+    constexpr const_reference operator[](size_t idx) const noexcept {
         return base_type::operator[](idx);
     }
 };
