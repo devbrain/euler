@@ -303,7 +303,7 @@ TEST_CASE("euler::vector row/column compatibility") {
     
     SUBCASE("constructor argument validation") {
         // This should compile - exactly 3 arguments
-        vector3 v1(1.0f, 2.0f, 3.0f);
+        [[maybe_unused]] vector3 v1(1.0f, 2.0f, 3.0f);
         
         // These should not compile (uncomment to test)
         // vector3 v2(1.0f, 2.0f);           // Too few
