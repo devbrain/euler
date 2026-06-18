@@ -97,7 +97,7 @@ public:
     
     // Expression template constructor
     template<typename Expr>
-    matrix(const expression<Expr, T>& expr) {
+    constexpr matrix(const expression<Expr, T>& expr) {
         for (size_t j = 0; j < cols; ++j) {
             for (size_t i = 0; i < rows; ++i) {
                 (*this)(i, j) = expr(i, j);
@@ -223,8 +223,8 @@ public:
     }
     
     // Data access
-    pointer data() noexcept { return data_.data(); }
-    const_pointer data() const noexcept { return data_.data(); }
+    constexpr pointer data() noexcept { return data_.data(); }
+    constexpr const_pointer data() const noexcept { return data_.data(); }
     
     // View creation methods
     matrix_view<T> view() {

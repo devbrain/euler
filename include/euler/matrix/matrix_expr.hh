@@ -373,7 +373,7 @@ EULER_DEFINE_EXPR_TRAITS(typename Expr, matrix_transpose_expression<Expr>);
 namespace detail {
 
 template<typename Op, typename Expr1, typename Expr2>
-auto make_matrix_binary_expr(Expr1&& e1, Expr2&& e2) {
+constexpr auto make_matrix_binary_expr(Expr1&& e1, Expr2&& e2) {
     decltype(auto) captured1 = capture_operand(std::forward<Expr1>(e1));
     decltype(auto) captured2 = capture_operand(std::forward<Expr2>(e2));
     using Captured1 = std::decay_t<decltype(captured1)>;
@@ -383,7 +383,7 @@ auto make_matrix_binary_expr(Expr1&& e1, Expr2&& e2) {
 
 // Factory for matrix-scalar expressions with rvalue detection
 template<typename Op, typename Expr, typename Scalar>
-auto make_matrix_scalar_expr(Expr&& expr, Scalar scalar) {
+constexpr auto make_matrix_scalar_expr(Expr&& expr, Scalar scalar) {
     decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
     using CapturedExpr = std::decay_t<decltype(captured)>;
     return matrix_scalar_expression<CapturedExpr, Scalar, Op>(captured, scalar);
@@ -391,7 +391,7 @@ auto make_matrix_scalar_expr(Expr&& expr, Scalar scalar) {
 
 // Factory for matrix unary expressions with rvalue detection
 template<typename Op, typename Expr>
-auto make_matrix_unary_expr(Expr&& expr) {
+constexpr auto make_matrix_unary_expr(Expr&& expr) {
     decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
     using CapturedExpr = std::decay_t<decltype(captured)>;
     return matrix_unary_expression<CapturedExpr, Op>(captured);
@@ -407,7 +407,7 @@ namespace detail {
 
 // Factory for matrix multiplication expressions with rvalue detection
 template<typename Expr1, typename Expr2>
-auto make_matrix_multiply_expr(Expr1&& e1, Expr2&& e2) {
+constexpr auto make_matrix_multiply_expr(Expr1&& e1, Expr2&& e2) {
     decltype(auto) captured1 = capture_operand(std::forward<Expr1>(e1));
     decltype(auto) captured2 = capture_operand(std::forward<Expr2>(e2));
     using Captured1 = std::decay_t<decltype(captured1)>;
@@ -417,7 +417,7 @@ auto make_matrix_multiply_expr(Expr1&& e1, Expr2&& e2) {
 
 // Factory for transpose expressions with rvalue detection
 template<typename Expr>
-auto make_transpose_expr(Expr&& expr) {
+constexpr auto make_transpose_expr(Expr&& expr) {
     decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
     using CapturedExpr = std::decay_t<decltype(captured)>;
     return ::euler::matrix_transpose_expression<CapturedExpr>(captured);
@@ -432,7 +432,7 @@ auto make_transpose_expr(Expr&& expr) {
 // Lvalue + Lvalue
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2>>>
-auto operator+(const Expr1& e1, const Expr2& e2) {
+constexpr auto operator+(const Expr1& e1, const Expr2& e2) {
     return detail::make_matrix_binary_expr<matrix_add>(e1, e2);
 }
 
@@ -440,7 +440,7 @@ auto operator+(const Expr1& e1, const Expr2& e2) {
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1>>>
-auto operator+(Expr1&& e1, const Expr2& e2) {
+constexpr auto operator+(Expr1&& e1, const Expr2& e2) {
     return detail::make_matrix_binary_expr<matrix_add>(std::forward<Expr1>(e1), e2);
 }
 
@@ -448,7 +448,7 @@ auto operator+(Expr1&& e1, const Expr2& e2) {
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr2>>>
-auto operator+(const Expr1& e1, Expr2&& e2) {
+constexpr auto operator+(const Expr1& e1, Expr2&& e2) {
     return detail::make_matrix_binary_expr<matrix_add>(e1, std::forward<Expr2>(e2));
 }
 
@@ -457,14 +457,14 @@ template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1> && !std::is_lvalue_reference_v<Expr2>>,
          typename = void>
-auto operator+(Expr1&& e1, Expr2&& e2) {
+constexpr auto operator+(Expr1&& e1, Expr2&& e2) {
     return detail::make_matrix_binary_expr<matrix_add>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
 // Subtraction: Lvalue - Lvalue
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<Expr2>>>
-auto operator-(const Expr1& e1, const Expr2& e2) {
+constexpr auto operator-(const Expr1& e1, const Expr2& e2) {
     return detail::make_matrix_binary_expr<matrix_sub>(e1, e2);
 }
 
@@ -472,7 +472,7 @@ auto operator-(const Expr1& e1, const Expr2& e2) {
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<Expr2>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1>>>
-auto operator-(Expr1&& e1, const Expr2& e2) {
+constexpr auto operator-(Expr1&& e1, const Expr2& e2) {
     return detail::make_matrix_binary_expr<matrix_sub>(std::forward<Expr1>(e1), e2);
 }
 
@@ -480,7 +480,7 @@ auto operator-(Expr1&& e1, const Expr2& e2) {
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<Expr1> && is_matrix_expression_v<std::decay_t<Expr2>>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr2>>>
-auto operator-(const Expr1& e1, Expr2&& e2) {
+constexpr auto operator-(const Expr1& e1, Expr2&& e2) {
     return detail::make_matrix_binary_expr<matrix_sub>(e1, std::forward<Expr2>(e2));
 }
 
@@ -489,35 +489,35 @@ template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr1>> && is_matrix_expression_v<std::decay_t<Expr2>>>,
          typename = std::enable_if_t<!std::is_lvalue_reference_v<Expr1> && !std::is_lvalue_reference_v<Expr2>>,
          typename = void>
-auto operator-(Expr1&& e1, Expr2&& e2) {
+constexpr auto operator-(Expr1&& e1, Expr2&& e2) {
     return detail::make_matrix_binary_expr<matrix_sub>(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 
 // Scalar multiplication: expr * scalar
 template<typename Expr, typename Scalar,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>> && std::is_arithmetic_v<Scalar>>>
-auto operator*(Expr&& expr, Scalar ascalar) {
+constexpr auto operator*(Expr&& expr, Scalar ascalar) {
     return detail::make_matrix_scalar_expr<matrix_mul>(std::forward<Expr>(expr), ascalar);
 }
 
 // Scalar multiplication: scalar * expr
 template<typename Scalar, typename Expr,
          typename = std::enable_if_t<std::is_arithmetic_v<Scalar> && is_matrix_expression_v<std::decay_t<Expr>>>>
-auto operator*(Scalar ascalar, Expr&& expr) {
+constexpr auto operator*(Scalar ascalar, Expr&& expr) {
     return detail::make_matrix_scalar_expr<matrix_mul>(std::forward<Expr>(expr), ascalar);
 }
 
 // Scalar division: expr / scalar
 template<typename Expr, typename Scalar,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>> && std::is_arithmetic_v<Scalar>>>
-auto operator/(Expr&& expr, Scalar ascalar) {
+constexpr auto operator/(Expr&& expr, Scalar ascalar) {
     return detail::make_matrix_scalar_expr<matrix_div>(std::forward<Expr>(expr), ascalar);
 }
 
 // Unary negation
 template<typename Expr,
          typename = std::enable_if_t<is_matrix_expression_v<std::decay_t<Expr>>>>
-auto operator-(Expr&& expr) {
+constexpr auto operator-(Expr&& expr) {
     return detail::make_matrix_unary_expr<matrix_negate>(std::forward<Expr>(expr));
 }
 
@@ -625,7 +625,7 @@ template<typename Expr1, typename Expr2,
                                      is_matrix_expression_v<std::decay_t<Expr2>> &&
                                      expression_traits<std::decay_t<Expr1>>::cols ==
                                      expression_traits<std::decay_t<Expr2>>::rows>>
-auto operator*(Expr1&& e1, Expr2&& e2) {
+constexpr auto operator*(Expr1&& e1, Expr2&& e2) {
     return detail::make_matrix_multiply_expr(std::forward<Expr1>(e1), std::forward<Expr2>(e2));
 }
 

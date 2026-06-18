@@ -18,19 +18,19 @@ public:
     using value_type = T;
     
     // Access the derived type
-    const derived& self() const & {
+    constexpr const derived& self() const & {
         return static_cast<const derived&>(*this);
     }
 
-    derived& self() & {
+    constexpr derived& self() & {
         return static_cast<derived&>(*this);
     }
 
-    derived&& self() && {
+    constexpr derived&& self() && {
         return static_cast<derived&&>(*this);
     }
 
-    const derived&& self() const && {
+    constexpr const derived&& self() const && {
         return static_cast<const derived&&>(*this);
     }
     
@@ -40,12 +40,12 @@ public:
     }
     
     // Element access (delegates to derived class)
-    T operator[](size_t idx) const {
+    constexpr T operator[](size_t idx) const {
         return self().eval_scalar(idx);
     }
-    
+
     // For 2D access (matrices)
-    T operator()(size_t i, size_t j) const {
+    constexpr T operator()(size_t i, size_t j) const {
         return self().eval_scalar(i, j);
     }
 };
@@ -110,7 +110,7 @@ namespace detail {
 // Capture an operand, wrapping rvalue leaf types in temp_holder
 // Uses decltype(auto) to preserve reference types for lvalues
 template<typename T>
-decltype(auto) capture_operand(T&& operand) {
+constexpr decltype(auto) capture_operand(T&& operand) {
     using DecayedT = std::decay_t<T>;
     constexpr bool is_rvalue = std::is_rvalue_reference_v<T&&>;
     constexpr bool is_leaf_type = is_leaf_v<DecayedT>;
@@ -155,14 +155,14 @@ public:
         ? std::decay_t<left_expr>::static_size
         : std::decay_t<right_expr>::static_size;
 
-    binary_expression(const std::decay_t<left_expr>& l, const std::decay_t<right_expr>& r)
+    constexpr binary_expression(const std::decay_t<left_expr>& l, const std::decay_t<right_expr>& r)
         : left(l), right(r) {}
 
-    value_type eval_scalar(size_t idx) const {
+    constexpr value_type eval_scalar(size_t idx) const {
         return op::apply(left[idx], right[idx]);
     }
 
-    value_type eval_scalar(size_t i, size_t j) const {
+    constexpr value_type eval_scalar(size_t i, size_t j) const {
         return op::apply(left(i, j), right(i, j));
     }
 
@@ -180,13 +180,13 @@ public:
     using expr_storage = detail::storage_type<expr>;
     static constexpr size_t static_size = std::decay_t<expr>::static_size;
 
-    unary_expression(const std::decay_t<expr>& operand_expr) : operand(operand_expr) {}
+    constexpr unary_expression(const std::decay_t<expr>& operand_expr) : operand(operand_expr) {}
 
-    value_type eval_scalar(size_t idx) const {
+    constexpr value_type eval_scalar(size_t idx) const {
         return op::apply(operand[idx]);
     }
 
-    value_type eval_scalar(size_t i, size_t j) const {
+    constexpr value_type eval_scalar(size_t i, size_t j) const {
         return op::apply(operand(i, j));
     }
 
@@ -220,22 +220,22 @@ public:
     using value_type = T;
     static constexpr size_t static_size = 0; // Dynamic size - means scalar
     
-    scalar_expression(T value) : val(value) {}
-    
-    value_type eval_scalar(size_t) const {
+    constexpr scalar_expression(T value) : val(value) {}
+
+    constexpr value_type eval_scalar(size_t) const {
         return val;
     }
-    
-    value_type eval_scalar(size_t, size_t) const {
+
+    constexpr value_type eval_scalar(size_t, size_t) const {
         return val;
     }
-    
+
     // Override operator[] to return scalar value regardless of index
-    value_type operator[](size_t) const {
+    constexpr value_type operator[](size_t) const {
         return val;
     }
-    
-    value_type operator()(size_t, size_t) const {
+
+    constexpr value_type operator()(size_t, size_t) const {
         return val;
     }
     
@@ -248,27 +248,27 @@ namespace ops {
     
     struct plus {
         template<typename T>
-        static T apply(T a, T b) { return a + b; }
+        static constexpr T apply(T a, T b) { return a + b; }
     };
-    
+
     struct minus {
         template<typename T>
-        static T apply(T a, T b) { return a - b; }
+        static constexpr T apply(T a, T b) { return a - b; }
     };
-    
+
     struct multiplies {
         template<typename T>
-        static T apply(T a, T b) { return a * b; }
+        static constexpr T apply(T a, T b) { return a * b; }
     };
-    
+
     struct divides {
         template<typename T>
-        static T apply(T a, T b) { return a / b; }
+        static constexpr T apply(T a, T b) { return a / b; }
     };
-    
+
     struct negate {
         template<typename T>
-        static T apply(T a) { return -a; }
+        static constexpr T apply(T a) { return -a; }
     };
     
 } // namespace ops
@@ -307,199 +307,199 @@ auto make_unary_expr(Expr&& expr) {
 
 // Binary operations between expressions
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator+(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator+(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::plus>(
         std::move(lhs).self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator+(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator+(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::plus>(
         std::move(lhs).self(),
         rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator+(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator+(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::plus>(
         lhs.self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator+(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator+(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::plus>(lhs.self(), rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator-(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator-(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::minus>(
         std::move(lhs).self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator-(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator-(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::minus>(
         std::move(lhs).self(),
         rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator-(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator-(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::minus>(
         lhs.self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator-(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator-(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::minus>(lhs.self(), rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator*(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator*(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::multiplies>(
         std::move(lhs).self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator*(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator*(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::multiplies>(
         std::move(lhs).self(),
         rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator*(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator*(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::multiplies>(
         lhs.self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator*(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator*(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::multiplies>(lhs.self(), rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator/(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator/(expression<E1, T>&& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::divides>(
         std::move(lhs).self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator/(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator/(expression<E1, T>&& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::divides>(
         std::move(lhs).self(),
         rhs.self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator/(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
+constexpr auto operator/(const expression<E1, T>& lhs, expression<E2, T>&& rhs) {
     return detail::make_binary_expr<ops::divides>(
         lhs.self(),
         std::move(rhs).self());
 }
 
 template<typename E1, typename E2, typename T = typename E1::value_type>
-auto operator/(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
+constexpr auto operator/(const expression<E1, T>& lhs, const expression<E2, T>& rhs) {
     return detail::make_binary_expr<ops::divides>(lhs.self(), rhs.self());
 }
 
 // Scalar operations - lvalue expression
 template<typename E, typename T = typename E::value_type>
-auto operator+(const expression<E, T>& lhs, T rhs) {
+constexpr auto operator+(const expression<E, T>& lhs, T rhs) {
     return detail::make_binary_expr<ops::plus>(lhs.self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator+(T lhs, const expression<E, T>& rhs) {
+constexpr auto operator+(T lhs, const expression<E, T>& rhs) {
     return detail::make_binary_expr<ops::plus>(scalar_expression<T>(lhs), rhs.self());
 }
 
 // Scalar operations - rvalue expression
 template<typename E, typename T = typename E::value_type>
-auto operator+(expression<E, T>&& lhs, T rhs) {
+constexpr auto operator+(expression<E, T>&& lhs, T rhs) {
     return detail::make_binary_expr<ops::plus>(std::move(lhs).self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator+(T lhs, expression<E, T>&& rhs) {
+constexpr auto operator+(T lhs, expression<E, T>&& rhs) {
     return detail::make_binary_expr<ops::plus>(scalar_expression<T>(lhs), std::move(rhs).self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator-(const expression<E, T>& lhs, T rhs) {
+constexpr auto operator-(const expression<E, T>& lhs, T rhs) {
     return detail::make_binary_expr<ops::minus>(lhs.self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator-(T lhs, const expression<E, T>& rhs) {
+constexpr auto operator-(T lhs, const expression<E, T>& rhs) {
     return detail::make_binary_expr<ops::minus>(scalar_expression<T>(lhs), rhs.self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator-(expression<E, T>&& lhs, T rhs) {
+constexpr auto operator-(expression<E, T>&& lhs, T rhs) {
     return detail::make_binary_expr<ops::minus>(std::move(lhs).self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator-(T lhs, expression<E, T>&& rhs) {
+constexpr auto operator-(T lhs, expression<E, T>&& rhs) {
     return detail::make_binary_expr<ops::minus>(scalar_expression<T>(lhs), std::move(rhs).self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator*(const expression<E, T>& lhs, T rhs) {
+constexpr auto operator*(const expression<E, T>& lhs, T rhs) {
     return detail::make_binary_expr<ops::multiplies>(lhs.self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator*(T lhs, const expression<E, T>& rhs) {
+constexpr auto operator*(T lhs, const expression<E, T>& rhs) {
     return detail::make_binary_expr<ops::multiplies>(scalar_expression<T>(lhs), rhs.self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator*(expression<E, T>&& lhs, T rhs) {
+constexpr auto operator*(expression<E, T>&& lhs, T rhs) {
     return detail::make_binary_expr<ops::multiplies>(std::move(lhs).self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator*(T lhs, expression<E, T>&& rhs) {
+constexpr auto operator*(T lhs, expression<E, T>&& rhs) {
     return detail::make_binary_expr<ops::multiplies>(scalar_expression<T>(lhs), std::move(rhs).self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator/(const expression<E, T>& lhs, T rhs) {
+constexpr auto operator/(const expression<E, T>& lhs, T rhs) {
     return detail::make_binary_expr<ops::divides>(lhs.self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator/(T lhs, const expression<E, T>& rhs) {
+constexpr auto operator/(T lhs, const expression<E, T>& rhs) {
     return detail::make_binary_expr<ops::divides>(scalar_expression<T>(lhs), rhs.self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator/(expression<E, T>&& lhs, T rhs) {
+constexpr auto operator/(expression<E, T>&& lhs, T rhs) {
     return detail::make_binary_expr<ops::divides>(std::move(lhs).self(), scalar_expression<T>(rhs));
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator/(T lhs, expression<E, T>&& rhs) {
+constexpr auto operator/(T lhs, expression<E, T>&& rhs) {
     return detail::make_binary_expr<ops::divides>(scalar_expression<T>(lhs), std::move(rhs).self());
 }
 
 // Unary operations
 template<typename E, typename T = typename E::value_type>
-auto operator-(const expression<E, T>& expr) {
+constexpr auto operator-(const expression<E, T>& expr) {
     return detail::make_unary_expr<ops::negate>(expr.self());
 }
 
 template<typename E, typename T = typename E::value_type>
-auto operator-(expression<E, T>&& expr) {
+constexpr auto operator-(expression<E, T>&& expr) {
     return detail::make_unary_expr<ops::negate>(std::move(expr).self());
 }
 

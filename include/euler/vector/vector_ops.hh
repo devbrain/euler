@@ -296,7 +296,7 @@ constexpr bool is_vector_expression_v = is_vector_expression<T>::value;
 // Dot product for any expression-like types (including matrix expressions used as vectors)
 template<typename Expr1, typename Expr2,
          typename = std::enable_if_t<is_vector_expression_v<Expr1> && is_vector_expression_v<Expr2>>>
-auto dot(const Expr1& a, const Expr2& b) -> decltype(a.eval_scalar(0)) {
+constexpr auto dot(const Expr1& a, const Expr2& b) -> decltype(a.eval_scalar(0)) {
     using T = decltype(a.eval_scalar(0));
     
     // Get the dimension from expression traits
@@ -315,7 +315,7 @@ auto dot(const Expr1& a, const Expr2& b) -> decltype(a.eval_scalar(0)) {
 template<typename Expr, typename Vec,
          typename = std::enable_if_t<is_vector_expression_v<Expr> && is_any_vector_v<Vec>>,
          typename = void>  // Extra parameter to avoid ambiguity
-auto dot(const Expr& a, const Vec& b) -> decltype(a.eval_scalar(0)) {
+constexpr auto dot(const Expr& a, const Vec& b) -> decltype(a.eval_scalar(0)) {
     using T = decltype(a.eval_scalar(0));
     const size_t N = vector_size_helper<Vec>::value;
     
@@ -330,7 +330,7 @@ auto dot(const Expr& a, const Vec& b) -> decltype(a.eval_scalar(0)) {
 template<typename Vec, typename Expr,
          typename = std::enable_if_t<is_any_vector_v<Vec> && is_vector_expression_v<Expr>>,
          typename = void, typename = void>  // Extra parameters to avoid ambiguity
-auto dot(const Vec& a, const Expr& b) -> typename Vec::value_type {
+constexpr auto dot(const Vec& a, const Expr& b) -> typename Vec::value_type {
     return dot(b, a);
 }
 
@@ -377,14 +377,14 @@ T dot(const Vec& vec, const matrix_view<T>& view) {
 // Length operations - immediate evaluation
 template<typename Vec,
          typename = std::enable_if_t<is_any_vector_v<Vec>>>
-auto length_squared(const Vec& v) -> typename Vec::value_type {
+constexpr auto length_squared(const Vec& v) -> typename Vec::value_type {
     return dot(v, v);
 }
 
 // Length squared for expressions
 template<typename Expr,
          typename = std::enable_if_t<is_vector_expression_v<Expr>>>
-auto length_squared(const Expr& v) -> decltype(v.eval_scalar(0)) {
+constexpr auto length_squared(const Expr& v) -> decltype(v.eval_scalar(0)) {
     return dot(v, v);
 }
 
@@ -755,13 +755,14 @@ auto smoothstep(const Edge0& edge0, const Edge1& edge1, const Vec& x) {
 // Utility functions
 template<typename Vec, typename T = typename Vec::value_type,
          typename = std::enable_if_t<is_any_vector_v<Vec>>>
-bool approx_equal(const Vec& a, const Vec& b, T eps = constants<T>::epsilon) {
+constexpr bool approx_equal(const Vec& a, const Vec& b, T eps = constants<T>::epsilon) {
     // Get the vector dimension
     constexpr size_t dim = expression_vector_size_v<Vec>;
-    
-    // Compare element by element
+
+    // Compare element by element (constexpr-friendly abs; std::abs is not constexpr in C++20)
     for (size_t i = 0; i < dim; ++i) {
-        if (std::abs(a[i] - b[i]) > eps) {
+        const T d = a[i] - b[i];
+        if ((d < T(0) ? -d : d) > eps) {
             return false;
         }
     }
@@ -770,13 +771,13 @@ bool approx_equal(const Vec& a, const Vec& b, T eps = constants<T>::epsilon) {
 
 template<typename Vec, typename T = typename Vec::value_type,
          typename = std::enable_if_t<is_any_vector_v<Vec>>>
-bool approx_zero(const Vec& v, T eps = constants<T>::epsilon) {
+constexpr bool approx_zero(const Vec& v, T eps = constants<T>::epsilon) {
     return length_squared(v) < eps * eps;
 }
 
 // 2D cross product (returns scalar)
 template<typename T>
-T cross(const vector<T, 2>& a, const vector<T, 2>& b) {
+constexpr T cross(const vector<T, 2>& a, const vector<T, 2>& b) {
     return a.x() * b.y() - a.y() * b.x();
 }
 

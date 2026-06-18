@@ -120,11 +120,17 @@ struct get_value_type<T, std::enable_if_t<is_complex_type_v<T>>> {
 template<typename T>
 using get_value_type_t = typename get_value_type<T>::type;
 
+// constexpr-friendly magnitude (std::abs is not constexpr in C++20).
+template<typename T>
+constexpr T approx_abs(T x) noexcept {
+    return x < T(0) ? -x : x;
+}
+
 // Approximate equality comparison for arrays
 template<typename T>
-bool approx_equal_array(const T* a, const T* b, size_t size, T tolerance) {
+constexpr bool approx_equal_array(const T* a, const T* b, size_t size, T tolerance) {
     for (size_t i = 0; i < size; ++i) {
-        if (std::abs(a[i] - b[i]) > tolerance) {
+        if (approx_abs(a[i] - b[i]) > tolerance) {
             return false;
         }
     }
@@ -136,7 +142,7 @@ bool approx_equal_array(const T* a, const T* b, size_t size, T tolerance) {
 // Since this is typically the last point where expressions are used, evaluation is performed immediately
 template<typename T1, typename T2,
          typename = std::enable_if_t<have_compatible_dimensions<T1, T2>()>>
-bool approx_equal(const T1& a, const T2& b,
+constexpr bool approx_equal(const T1& a, const T2& b,
                   std::common_type_t<get_value_type_t<T1>, get_value_type_t<T2>> tolerance =
                       constants<std::common_type_t<get_value_type_t<T1>, get_value_type_t<T2>>>::epsilon) {
     
@@ -164,8 +170,8 @@ bool approx_equal(const T1& a, const T2& b,
         if constexpr (is_complex_type_v<T1> || is_complex_type_v<T2>) {
             // If both are complex
             if constexpr (is_complex_type_v<T1> && is_complex_type_v<T2>) {
-                return std::abs(a.real() - b.real()) <= tolerance && 
-                       std::abs(a.imag() - b.imag()) <= tolerance;
+                return approx_abs(a.real() - b.real()) <= tolerance && 
+                       approx_abs(a.imag() - b.imag()) <= tolerance;
             }
             // If only one is complex, convert the other to complex
             else if constexpr (is_complex_type_v<T1>) {
@@ -175,8 +181,8 @@ bool approx_equal(const T1& a, const T2& b,
                 } else {
                     b_val = static_cast<value_type>(b);
                 }
-                return std::abs(a.real() - b_val) <= tolerance && 
-                       std::abs(a.imag()) <= tolerance;
+                return approx_abs(a.real() - b_val) <= tolerance && 
+                       approx_abs(a.imag()) <= tolerance;
             }
             else { // T2 is complex
                 value_type a_val;
@@ -185,8 +191,8 @@ bool approx_equal(const T1& a, const T2& b,
                 } else {
                     a_val = static_cast<value_type>(a);
                 }
-                return std::abs(a_val - b.real()) <= tolerance && 
-                       std::abs(b.imag()) <= tolerance;
+                return approx_abs(a_val - b.real()) <= tolerance && 
+                       approx_abs(b.imag()) <= tolerance;
             }
         }
         // Handle angle/scalar comparison
@@ -205,7 +211,7 @@ bool approx_equal(const T1& a, const T2& b,
                 val_b = static_cast<value_type>(b);
             }
             
-            return std::abs(val_a - val_b) <= tolerance;
+            return approx_abs(val_a - val_b) <= tolerance;
         }
     }
     // Handle vector-vector comparison
