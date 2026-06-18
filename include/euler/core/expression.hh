@@ -281,7 +281,7 @@ namespace detail {
 
 // Factory for binary expressions - handles rvalue detection and wrapping
 template<typename Op, typename LHS, typename RHS>
-auto make_binary_expr(LHS&& lhs, RHS&& rhs) {
+constexpr auto make_binary_expr(LHS&& lhs, RHS&& rhs) {
     // Use decltype(auto) to preserve references when capture_operand returns a reference
     decltype(auto) captured_lhs = capture_operand(std::forward<LHS>(lhs));
     decltype(auto) captured_rhs = capture_operand(std::forward<RHS>(rhs));
@@ -293,7 +293,7 @@ auto make_binary_expr(LHS&& lhs, RHS&& rhs) {
 
 // Factory for unary expressions - handles rvalue detection and wrapping
 template<typename Op, typename Expr>
-auto make_unary_expr(Expr&& expr) {
+constexpr auto make_unary_expr(Expr&& expr) {
     decltype(auto) captured = capture_operand(std::forward<Expr>(expr));
     using CapturedExpr = std::decay_t<decltype(captured)>;
     return unary_expression<CapturedExpr, Op>(captured);
