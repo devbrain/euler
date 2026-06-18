@@ -166,7 +166,7 @@ public:
     
     // Expression template assignment
     template<typename Expr>
-    matrix& operator=(const expression<Expr, T>& expr) {
+    constexpr matrix& operator=(const expression<Expr, T>& expr) {
         for (size_t j = 0; j < cols; ++j) {
             for (size_t i = 0; i < rows; ++i) {
                 (*this)(i, j) = expr(i, j);

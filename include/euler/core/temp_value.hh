@@ -55,28 +55,28 @@ public:
     using value_type = typename T::value_type;
     static constexpr size_t static_size = T::static_size;
 
-    vector_temp_holder(vector_temp_holder&& other) noexcept
+    constexpr vector_temp_holder(vector_temp_holder&& other) noexcept
         : value_(std::move(other.value_)) {}
 
-    vector_temp_holder(const vector_temp_holder& other)
+    constexpr vector_temp_holder(const vector_temp_holder& other)
         : value_(other.value_) {}
 
-    explicit vector_temp_holder(T&& v)
+    explicit constexpr vector_temp_holder(T&& v)
         : value_(std::move(v)) {}
 
-    value_type operator[](size_t i) const {
+    constexpr value_type operator[](size_t i) const {
         return value_[i];
     }
 
-    value_type operator()(size_t row, size_t col) const {
+    constexpr value_type operator()(size_t row, size_t col) const {
         return value_(row, col);
     }
 
-    value_type eval_scalar(size_t i) const {
+    constexpr value_type eval_scalar(size_t i) const {
         return value_[i];
     }
 
-    value_type eval_scalar(size_t row, size_t col) const {
+    constexpr value_type eval_scalar(size_t row, size_t col) const {
         return value_(row, col);
     }
 
@@ -96,28 +96,28 @@ public:
     static constexpr size_t cols = T::cols;
     static constexpr size_t static_size = rows * cols;
 
-    matrix_temp_holder(matrix_temp_holder&& other) noexcept
+    constexpr matrix_temp_holder(matrix_temp_holder&& other) noexcept
         : value_(std::move(other.value_)) {}
 
-    matrix_temp_holder(const matrix_temp_holder& other)
+    constexpr matrix_temp_holder(const matrix_temp_holder& other)
         : value_(other.value_) {}
 
-    explicit matrix_temp_holder(T&& v)
+    explicit constexpr matrix_temp_holder(T&& v)
         : value_(std::move(v)) {}
 
-    value_type operator()(size_t row, size_t col) const {
+    constexpr value_type operator()(size_t row, size_t col) const {
         return value_(row, col);
     }
 
-    value_type operator[](size_t i) const {
+    constexpr value_type operator[](size_t i) const {
         return value_[i];
     }
 
-    value_type eval_scalar(size_t i) const {
+    constexpr value_type eval_scalar(size_t i) const {
         return value_[i];
     }
 
-    value_type eval_scalar(size_t row, size_t col) const {
+    constexpr value_type eval_scalar(size_t row, size_t col) const {
         return value_(row, col);
     }
 
