@@ -8,6 +8,7 @@
 #include <euler/core/types.hh>
 #include <cmath>
 #include <stdexcept>
+#include <type_traits>
 
 namespace euler {
 
@@ -107,6 +108,12 @@ public:
  * @{
  */
 
+// Run a runtime check expression only when NOT in a constant-evaluation context.
+// std::is_constant_evaluated() lets element accessors etc. that carry a debug bounds
+// check still be used in constexpr (the check is skipped at compile time, run at runtime).
+#define EULER_DETAIL_RUNTIME_CHECK(expr) \
+    (::std::is_constant_evaluated() ? (void)0 : (void)(expr))
+
 // If EULER_DISABLE_ENFORCE is defined, disable all runtime checks
 #ifdef EULER_DISABLE_ENFORCE
     #define EULER_CHECK(condition, error_code, ...) ((void)0)
@@ -121,54 +128,54 @@ public:
 // Debug mode checks - always enabled in debug builds
 #elif defined(EULER_DEBUG)
     #define EULER_CHECK(condition, error_code, ...) \
-        ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__))
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__)))
+
     #define EULER_CHECK_INDEX(idx, size) \
-        ENFORCE((idx) < (size))(::failsafe::detail::build_message( \
-            "Index out of bounds: ", (idx), " >= ", (size)))
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((idx) < (size))(::failsafe::detail::build_message( \
+            "Index out of bounds: ", (idx), " >= ", (size))))
+
     #define EULER_CHECK_DIMENSIONS(rows1, cols1, rows2, cols2) \
-        ENFORCE((rows1) == (rows2) && (cols1) == (cols2))( \
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((rows1) == (rows2) && (cols1) == (cols2))( \
             ::failsafe::detail::build_message( \
-                "Dimension mismatch: ", (rows1), "x", (cols1), " vs ", (rows2), "x", (cols2)))
-    
+                "Dimension mismatch: ", (rows1), "x", (cols1), " vs ", (rows2), "x", (cols2))))
+
     #define EULER_CHECK_MULTIPLY_DIMENSIONS(cols1, rows2) \
-        ENFORCE((cols1) == (rows2))( \
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((cols1) == (rows2))( \
             ::failsafe::detail::build_message( \
-                "Cannot multiply: first matrix has ", (cols1), " columns, second has ", (rows2), " rows"))
-    
+                "Cannot multiply: first matrix has ", (cols1), " columns, second has ", (rows2), " rows")))
+
     #define EULER_CHECK_NOT_NULL(ptr) \
-        ENFORCE_NOT_NULL(ptr)
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE_NOT_NULL(ptr))
+
     #define EULER_DEBUG_CHECK(condition, error_code, ...) \
-        ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__))
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__)))
+
     #define EULER_CHECK_POSITIVE(value, name) \
-        ENFORCE((value) > 0)(::failsafe::detail::build_message( \
-            name, " must be positive, got ", (value)))
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((value) > 0)(::failsafe::detail::build_message( \
+            name, " must be positive, got ", (value))))
 
 // Release mode with safety checks - can be enabled via EULER_SAFE_RELEASE
 #elif defined(EULER_SAFE_RELEASE)
     #define EULER_CHECK(condition, error_code, ...) \
-        ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__))
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__)))
+
     #define EULER_CHECK_INDEX(idx, size) \
-        ENFORCE((idx) < (size))("Index out of bounds")
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((idx) < (size))("Index out of bounds"))
+
     #define EULER_CHECK_DIMENSIONS(rows1, cols1, rows2, cols2) \
-        ENFORCE((rows1) == (rows2) && (cols1) == (cols2))("Dimension mismatch")
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((rows1) == (rows2) && (cols1) == (cols2))("Dimension mismatch"))
+
     #define EULER_CHECK_MULTIPLY_DIMENSIONS(cols1, rows2) \
-        ENFORCE((cols1) == (rows2))("Cannot multiply matrices")
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((cols1) == (rows2))("Cannot multiply matrices"))
+
     #define EULER_CHECK_NOT_NULL(ptr) \
-        ENFORCE_NOT_NULL(ptr)
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE_NOT_NULL(ptr))
+
     #define EULER_DEBUG_CHECK(condition, error_code, ...) \
-        ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__))
-    
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE(condition)(::failsafe::detail::build_message(__VA_ARGS__)))
+
     #define EULER_CHECK_POSITIVE(value, name) \
-        ENFORCE((value) > 0)("Invalid size")
+        EULER_DETAIL_RUNTIME_CHECK(ENFORCE((value) > 0)("Invalid size"))
 
 // Full release mode - no runtime checks
 #else
